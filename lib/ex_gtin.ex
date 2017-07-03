@@ -16,7 +16,7 @@ defmodule ExGtin do
       iex> ExGtin.gtin_check_digit("6291041500214")
       {:error}
   """
-  @spec gtin_check_digit(string) :: { atom }
+  @spec gtin_check_digit(string) :: {atom}
   def gtin_check_digit(number) when is_bitstring(number) do
     number
       |> String.codepoints
@@ -24,11 +24,11 @@ defmodule ExGtin do
       |> gtin_check_digit
   end
 
-  @spec gtin_check_digit(number) :: { atom }
+  @spec gtin_check_digit(number) :: {atom}
   def gtin_check_digit(number) when is_number(number), do: gtin_check_digit(Integer.digits(number))
 
 
-  @spec gtin_check_digit(list(number)) :: { atom }
+  @spec gtin_check_digit(list(number)) :: {atom}
   def gtin_check_digit(number) do
     {code, check_digit} = Enum.split(number, length(number) - 1)
     calculated_check_digit = code
