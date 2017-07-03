@@ -1,6 +1,15 @@
 # ExGtin
 
-**TODO: Add description**
+A GTIN Validation Library in elixir.
+
+## Features
+
+** Supports GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
+
+## Reference
+
+** [GTIN](https://www.gs1.org)
+** [How to calculate GTIN](https://www.gs1.org/how-calculate-check-digit-manually)
 
 ## Installation
 
@@ -16,4 +25,3 @@ end
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/ex_gtin](https://hexdocs.pm/ex_gtin).
-
