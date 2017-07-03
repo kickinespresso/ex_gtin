@@ -4,12 +4,12 @@ A GTIN Validation Library in elixir.
 
 ## Features
 
-** Supports GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
+- Supports GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
 
 ## Reference
 
-** [GTIN](https://www.gs1.org)
-** [How to calculate GTIN](https://www.gs1.org/how-calculate-check-digit-manually)
+- [GTIN](https://www.gs1.org)
+- [How to calculate GTIN](https://www.gs1.org/how-calculate-check-digit-manually)
 
 ## Installation
 
@@ -32,7 +32,7 @@ Run tests with
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.MD) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
