@@ -14,10 +14,10 @@ defmodule ExGtin do
   ## Examples
 
       iex> ExGtin.check_gtin("6291041500213")
-      {:ok}
+      {:ok, "GTIN-13"}
 
       iex> ExGtin.check_gtin("6291041500214")
-      {:error}
+      {:error, "Invalid Code"}
   """
   @spec check_gtin(string | list(number)) :: {atom}
   def check_gtin(number) do
