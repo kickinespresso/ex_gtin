@@ -1,3 +1,5 @@
+[![Build Status](https://semaphoreci.com/api/v1/kickinespresso/ex_gtin/branches/master/badge.svg)](https://semaphoreci.com/kickinespresso/ex_gtin)
+
 # ExGtin
 
 A GTIN Validation Library in elixir.
@@ -5,6 +7,10 @@ A GTIN Validation Library in elixir.
 ## Features
 
 - Supports GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
+
+## Usage
+
+    ExGtin.check_gtin("6291041500213")
 
 ## Reference
 
