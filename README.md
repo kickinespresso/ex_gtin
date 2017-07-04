@@ -42,7 +42,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 ## Sponsors
 
-This project is sponsored by [KickinEspresso](www.kickinespresso.com)
+This project is sponsored by [KickinEspresso](https://www.kickinespresso.com)
 
 ## Versioning
 
