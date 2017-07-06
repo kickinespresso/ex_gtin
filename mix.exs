@@ -3,17 +3,22 @@ defmodule ExGtin.Mixfile do
 
   def project do
     [app: :ex_gtin,
-     version: "0.2.2",
-     elixir: "~> 1.4",
-     description: description(),
-     aliases: aliases(),
-     package: package(),
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps(),
-     source_url: "https://github.com/kickinespresso/ex_gtin",
-     test_coverage: [tool: ExCoveralls],
-     coverallspreferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test],
+      version: "0.2.2",
+      elixir: "~> 1.4",
+      description: description(),
+      aliases: aliases(),
+      package: package(),
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      deps: deps(),
+      source_url: "https://github.com/kickinespresso/ex_gtin",
+      test_coverage: [tool: ExCoveralls],
+      coverallspreferred_cli_env: [
+        "coveralls": :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ],
    ]
   end
 
@@ -35,6 +40,7 @@ defmodule ExGtin.Mixfile do
 
   defp package do
     [
+      name: "ExGtin",
       maintainers: ["KickinEspresso"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/kickinespresso/ex_gtin"}
@@ -49,6 +55,5 @@ defmodule ExGtin.Mixfile do
      """
        Elixir GTIN Validation Library.
      """
-   end
-
+  end
 end
