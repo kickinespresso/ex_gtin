@@ -5,7 +5,7 @@
 
 # ExGtin
 
-A GTIN Validation Library in elixir.
+A GTIN (Global Trade Item Number) Validation Library in Elixir under the GS1 specification.
 
 ## Features
 
@@ -76,7 +76,7 @@ When making pull requests, please be sure to update the [CHANGELOG.md](CHANGELOG
 
 ## Sponsors
 
-This project is sponsored by [KickinEspresso](https://www.kickinespresso.com)
+This project is sponsored by [KickinEspresso](https://kickinespresso.com/?utm_source=github&utm_medium=sponsor&utm_campaign=opensource)
 
 ## Versioning
 
