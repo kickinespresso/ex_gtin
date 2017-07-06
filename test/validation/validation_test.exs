@@ -1,6 +1,6 @@
 defmodule ExGtin.ValidationTest do
   use ExUnit.Case
-  doctest ExGtin
+  doctest ExGtin.Validation
   import ExGtin.Validation
 
   # @valid_gtin_codes_atoms %{
