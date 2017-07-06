@@ -16,33 +16,33 @@ A GTIN Validation Library in elixir.
 
 - Check GTIN codes
 
-    iex> ExGtin.check_gtin("6291041500213")
-    {:ok, "GTIN-13"}
+      iex> ExGtin.check_gtin("6291041500213")
+      {:ok, "GTIN-13"}
 
-    iex> ExGtin.check_gtin("6291041500214")
-    {:error, "Invalid Code"}
+      iex> ExGtin.check_gtin("6291041500214")
+      {:error, "Invalid Code"}
 
 - Generate GTIN codes
 
-    iex> ExGtin.generate_gtin("629104150021")
-    "6291041500213"
+      iex> ExGtin.generate_gtin("629104150021")
+      "6291041500213"
 
 ### Using Strings, Arrays or Numbers
 
 - String
 
-    iex> ExGtin.check_gtin("6291041500213")
-    {:ok, "GTIN-13"}
+      iex> ExGtin.check_gtin("6291041500213")
+      {:ok, "GTIN-13"}
 
 - Array of Integers    
 
-    iex> ExGtin.check_gtin([6,2,9,1,0,4,1,5,0,0,2,1,3])
-    {:ok, "GTIN-13"}
+      iex> ExGtin.check_gtin([6,2,9,1,0,4,1,5,0,0,2,1,3])
+      {:ok, "GTIN-13"}
 
 - Integer
 
-    iex> ExGtin.check_gtin(6291041500213)
-    {:ok, "GTIN-13"}
+      iex> ExGtin.check_gtin(6291041500213)
+      {:ok, "GTIN-13"}
 
     *Integers with leading zeros may not process properly*
 
@@ -82,7 +82,6 @@ This project is sponsored by [KickinEspresso](https://www.kickinespresso.com)
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/kickinespresso/ex_gtin/tags).
-
 
 ## License
 
