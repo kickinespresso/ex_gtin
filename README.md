@@ -82,6 +82,10 @@ This project is sponsored by [KickinEspresso](https://kickinespresso.com/?utm_so
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/kickinespresso/ex_gtin/tags).
 
+## Code of Conduct
+
+Please refer to the [Code of Conduct](CODE_OF_CONDUCT.md) for details
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
