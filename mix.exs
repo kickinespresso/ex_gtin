@@ -3,7 +3,7 @@ defmodule ExGtin.Mixfile do
 
   def project do
     [app: :ex_gtin,
-      version: "0.2.3",
+      version: "0.2.4",
       elixir: "~> 1.4",
       description: description(),
       aliases: aliases(),
@@ -40,7 +40,7 @@ defmodule ExGtin.Mixfile do
 
   defp package do
     [
-      name: "ExGtin",
+      name: "ex_gtin",
       maintainers: ["KickinEspresso"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/kickinespresso/ex_gtin"}
