@@ -7,7 +7,7 @@ defmodule ExGtin.Validation do
   @doc """
   Check for valid  GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
 
-  Returns `{:ok}` or `{:error}`
+  Returns `{atom, String.t()}`
 
   ## Examples
 
@@ -17,7 +17,7 @@ defmodule ExGtin.Validation do
       iex> ExGtin.Validation.gtin_check_digit("6291041500214")
       {:error, "Invalid Code"}
   """
-  @spec gtin_check_digit(string) :: {atom, string}
+  @spec gtin_check_digit(String.t()) :: {atom, String.t()}
   def gtin_check_digit(number) when is_bitstring(number) do
     number
       |> String.codepoints
@@ -25,10 +25,10 @@ defmodule ExGtin.Validation do
       |> gtin_check_digit
   end
 
-  @spec gtin_check_digit(number) :: {atom, string}
+  @spec gtin_check_digit(number) :: {atom, String.t()}
   def gtin_check_digit(number) when is_number(number), do: gtin_check_digit(Integer.digits(number))
 
-  @spec gtin_check_digit(list(number)) :: {atom, string}
+  @spec gtin_check_digit(list(number)) :: {atom, String.t()}
   def gtin_check_digit(number) do
     case check_code_length(number) do
       {:ok, gtin_type} ->
@@ -47,7 +47,7 @@ defmodule ExGtin.Validation do
   @doc """
   Generate valid  GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
 
-  Returns `{:ok}` or `{:error}`
+  Returns `{atom, String.t()}`
 
   ## Examples
 
@@ -57,7 +57,7 @@ defmodule ExGtin.Validation do
       iex> ExGtin.Validation.gtin_check_digit("6291041500214")
       {:error, "Invalid Code"}
   """
-  @spec generate_gtin_code(string) :: string | {atom, string}
+  @spec generate_gtin_code(String.t()) :: String.t() | {atom, String.t()}
   def generate_gtin_code(number) when is_bitstring(number) do
     number
       |> String.codepoints
@@ -65,13 +65,13 @@ defmodule ExGtin.Validation do
       |> generate_gtin_code
   end
 
-  @spec generate_gtin_code(number) :: string | {atom, string}
+  @spec generate_gtin_code(number) :: String.t() | {atom, String.t()}
   def generate_gtin_code(number) when is_number(number), do: generate_gtin_code(Integer.digits(number))
 
-  @spec generate_gtin_code(list(number)) :: string | {atom, string}
+  @spec generate_gtin_code(list(number)) :: String.t() | {atom, String.t()}
   def generate_gtin_code(number) do
     case generate_check_code_length(number) do
-      {:ok, gtin_type} ->
+      {:ok, _} ->
         check_digit = generate_check_digit(number)
         number
          |> Enum.concat([check_digit])
@@ -83,7 +83,7 @@ defmodule ExGtin.Validation do
   @doc """
   Generate check digit  GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
 
-  Returns number
+  Returns `number`
 
   ## Examples
 
@@ -101,7 +101,7 @@ defmodule ExGtin.Validation do
   @doc """
   Calculates the sum of the digits in a string and multiplied value based on index order
 
-  Returns sum of values
+  Returns `number`
 
   ## Examples
 
@@ -122,7 +122,7 @@ defmodule ExGtin.Validation do
   @doc """
   Calculates the difference of the highest rounded multiple of 10
 
-  Returns the difference of the highest rounded multiple of 10
+  Returns `number`
 
   ## Examples
 
@@ -139,7 +139,7 @@ defmodule ExGtin.Validation do
   By index, returns the corresponding value to multiply
   the digit by
 
-  Returns the value to multiply by
+  Returns `number`
 
   ## Examples
 
@@ -162,7 +162,7 @@ defmodule ExGtin.Validation do
   Checks the code for the proper length as specified by the
   GTIN-8,12,13,14 specification
 
-  Returns {:ok, gtin_type } | {:error | message}
+  Returns {atom, String.t()}
 
   ## Examples
 
@@ -173,7 +173,7 @@ defmodule ExGtin.Validation do
       {:error, "Invalid GTIN Code Length"}
 
   """
-  @spec check_code_length(list(number)) :: {atom, string}
+  @spec check_code_length(list(number)) :: {atom, String.t()}
   def check_code_length(number) do
     case length(number) do
       8  -> {:ok, "GTIN-8"}
@@ -190,7 +190,7 @@ defmodule ExGtin.Validation do
   The code should be -1 the length of the GTIN code as the check digit
   will be added later
 
-  Returns {:ok, gtin_type } | {:error | message}
+  Returns {atom, String.t()}
 
   ## Examples
 
@@ -201,6 +201,6 @@ defmodule ExGtin.Validation do
       {:error, "Invalid GTIN Code Length"}
 
   """
-  @spec generate_check_code_length(list(number)) :: {atom, string}
+  @spec generate_check_code_length(list(number)) :: {atom, String.t()}
   def generate_check_code_length(number), do: check_code_length(number ++ [1])
 end

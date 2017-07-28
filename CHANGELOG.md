@@ -4,12 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Unpublished
+## [0.2.3] - 2017-07-28
 ### Changed
-- Fixing Readme
+- Fixing [README.md](README.md) formatting @cdesch
+- Refactored `string` type spec to `String.t()` @cdesch
+- Added composite mix task for validating the library @cdesch
+- Changed [CONTRIBUTING.md](CONTRIBUTING.md) pull request process to test the library @cdesch
 
 ### Added
-- Added .editorconfig file
+- Added .editorconfig file @cdesch
+- Added more test for each type of GTIN @cdesch
 
 ## [0.2.2] - 2017-07-06
 ### Added

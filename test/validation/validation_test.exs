@@ -3,24 +3,6 @@ defmodule ExGtin.ValidationTest do
   doctest ExGtin.Validation
   import ExGtin.Validation
 
-  # @valid_gtin_codes_atoms %{
-  #  codes: [
-  #     {code_type: :gtin_8, code: "12331239"},
-  #     {code_type: :gtin_12, code: "648271231220"},
-  #     {code_type: :gtin_13, code: "6291041500213"},
-  #     {code_type: :gtin_14, code: "22312312231235"}
-  #   ]
-  #  }
-
-   @valid_gtin_codes_arrays %{
-     codes: [
-       [1,2,3,3,1,2,3,9],
-       [6,4,8,2,7,1,2,3,1,2,2,0],
-       [6,2,9,1,0,4,1,5,0,0,2,1,3],
-       [2,2,3,1,2,3,1,2,2,3,1,2,3,5],
-    ]
-  }
-
   test "gtin_check_digit function with valid number string" do
     number = "6291041500213"
     assert {:ok, "GTIN-13"} == gtin_check_digit(number)
@@ -92,7 +74,6 @@ defmodule ExGtin.ValidationTest do
       [1,2,3,4,5,6,7,8,9,10,11,12],
       [1,2,3,4,5,6,7,8,9,10,11,12,13]
     ]
-
     Enum.map(codes, fn(x) -> assert {:ok, "GTIN-#{length(x) + 1}"} == generate_check_code_length(x) end)
   end
 

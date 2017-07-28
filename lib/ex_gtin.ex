@@ -19,7 +19,7 @@ defmodule ExGtin do
       iex> ExGtin.check_gtin("6291041500214")
       {:error, "Invalid Code"}
   """
-  @spec check_gtin(string | list(number)) :: {atom, string}
+  @spec check_gtin(String.t() | list(number)) :: {atom, String.t()}
   def check_gtin(number) do
     gtin_check_digit(number)
   end
@@ -35,7 +35,7 @@ defmodule ExGtin do
       "6291041500213"
 
   """
-  @spec generate_gtin(string | list(number)) :: number | {atom, string}
+  @spec generate_gtin(String.t() | list(number)) :: number | {atom, String.t()}
   def generate_gtin(number) do
     generate_gtin_code(number)
   end

@@ -3,7 +3,7 @@ defmodule ExGtin.Mixfile do
 
   def project do
     [app: :ex_gtin,
-      version: "0.2.2",
+      version: "0.2.3",
       elixir: "~> 1.4",
       description: description(),
       aliases: aliases(),
@@ -48,7 +48,13 @@ defmodule ExGtin.Mixfile do
   end
 
   defp aliases do
-    [c: "compile"]
+    [c: "compile",
+      "pull_request_checkout.task": [
+        "test",
+        "credo --strict",
+        "coveralls"
+      ]
+    ]
   end
 
   defp description do
