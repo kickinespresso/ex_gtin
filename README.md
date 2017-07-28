@@ -54,11 +54,11 @@ A GTIN (Global Trade Item Number) Validation Library in Elixir under the GS1 spe
 
 ```elixir
 def deps do
-  [{:ex_gtin, "~> 0.2.2"}]
+  [{:ex_gtin, "~> 0.2.4"}]
 end
 ```
 
-Documentation can be found at [https://hexdocs.pm/ex_gtin](https://hexdocs.pm/ex_gtin) on [HexDocs](https://hexdocs.pm). 
+Documentation can be found at [https://hexdocs.pm/ex_gtin](https://hexdocs.pm/ex_gtin) on [HexDocs](https://hexdocs.pm).
 
 ## Tests
 
