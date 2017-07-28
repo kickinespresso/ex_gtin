@@ -58,9 +58,7 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/ex_gtin](https://hexdocs.pm/ex_gtin).
+Documentation can be found at [https://hexdocs.pm/ex_gtin](https://hexdocs.pm/ex_gtin) on [HexDocs](https://hexdocs.pm). 
 
 ## Tests
 
@@ -81,6 +79,10 @@ This project is sponsored by [KickinEspresso](https://kickinespresso.com/?utm_so
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/kickinespresso/ex_gtin/tags).
+
+## Code of Conduct
+
+Please refer to the [Code of Conduct](CODE_OF_CONDUCT.md) for details
 
 ## License
 
