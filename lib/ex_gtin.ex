@@ -34,6 +34,9 @@ defmodule ExGtin do
       iex> ExGtin.generate_gtin("629104150021")
       "6291041500213"
 
+      iex> ExGtin.generate_gtin("62921")
+      {:error, "Invalid GTIN Code Length"}
+
   """
   @spec generate_gtin(String.t() | list(number)) :: number | {atom, String.t()}
   def generate_gtin(number) do

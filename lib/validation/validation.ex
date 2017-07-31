@@ -51,11 +51,12 @@ defmodule ExGtin.Validation do
 
   ## Examples
 
-      iex> ExGtin.Validation.gtin_check_digit("6291041500213")
-      {:ok, "GTIN-13"}
+      iex> ExGtin.Validation.generate_gtin_code("629104150021")
+      "6291041500213"
 
-      iex> ExGtin.Validation.gtin_check_digit("6291041500214")
-      {:error, "Invalid Code"}
+      iex> ExGtin.Validation.generate_gtin_code("62921")
+      {:error, "Invalid GTIN Code Length"}
+
   """
   @spec generate_gtin_code(String.t()) :: String.t() | {atom, String.t()}
   def generate_gtin_code(number) when is_bitstring(number) do
