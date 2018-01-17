@@ -14,6 +14,14 @@ A GTIN (Global Trade Item Number) Validation Library in Elixir under the GS1 spe
 - Check GTIN validity 
 - Lookup GS1 country prefix
 
+## Installation
+
+```elixir
+def deps do
+  [{:ex_gtin, "~> 0.3.0"}]
+end
+```
+
 ## Usage
 
 - Check GTIN codes
@@ -58,13 +66,7 @@ A GTIN (Global Trade Item Number) Validation Library in Elixir under the GS1 spe
 - [GTIN](https://www.gs1.org)
 - [How to calculate GTIN](https://www.gs1.org/how-calculate-check-digit-manually)
 
-## Installation
 
-```elixir
-def deps do
-  [{:ex_gtin, "~> 0.2.4"}]
-end
-```
 
 Documentation can be found at [https://hexdocs.pm/ex_gtin](https://hexdocs.pm/ex_gtin) on [HexDocs](https://hexdocs.pm).
 
