@@ -9,7 +9,7 @@ A GTIN (Global Trade Item Number) Validation Library in Elixir under the GS1 spe
 
 ## Features
 
-- Supports GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
+- Supports GTIN-8, GTIN-12 (UPC-12), GTIN-13 (GLN), GTIN-14, GSIN, SSCC codes
 
 ## Usage
 

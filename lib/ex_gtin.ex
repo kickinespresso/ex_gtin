@@ -43,4 +43,9 @@ defmodule ExGtin do
     generate_gtin_code(number)
   end
 
+  @spec gs1_prefix_country(String.t() | list(number)) :: {atom, String.t()}
+  def gs1_prefix_country(number) do
+    find_gs1_prefix_country(number)
+  end
+
 end

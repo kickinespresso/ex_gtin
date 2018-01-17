@@ -204,4 +204,54 @@ defmodule ExGtin.Validation do
   """
   @spec generate_check_code_length(list(number)) :: {atom, String.t()}
   def generate_check_code_length(number), do: check_code_length(number ++ [1])
+
+
+  @spec find_gs1_prefix_country(String.t()) :: {atom, String.t()}
+  def find_gs1_prefix_country(number) when is_bitstring(number) do
+    number
+      |> String.codepoints
+      |> Enum.map(fn(x) -> String.to_integer(x) end)
+      |> find_gs1_prefix_country
+  end
+
+  @spec find_gs1_prefix_country(number) :: {atom, String.t()}
+  def find_gs1_prefix_country(number) when is_number(number), do: find_gs1_prefix_country(Integer.digits(number))
+
+  @spec find_gs1_prefix_country(list(number)) :: {atom, String.t()}
+  def find_gs1_prefix_country(number) do
+    IO.puts "here"
+    case check_code_length(number) do
+      {:ok, gtin_type} ->
+        {prefix, code} = Enum.split(number, 3)
+        prefix
+          |> Enum.join
+          |> String.to_integer
+          |> lookup_gs1_prefix
+        # calculated_check_digit = code
+        #   |> multiply_and_sum_array
+        #   |> subtract_from_nearest_multiple_of_ten
+        # case calculated_check_digit == Enum.at(check_digit, 0) do
+        #   true -> {:ok, gtin_type}
+        #   _ -> {:error, "Invalid Code"}
+        # end
+      {:error, error} -> {:error, error}
+    end
+  end
+
+  @doc """
+  Looks up the GS1 prefix in a table
+  GS1 Reference https://www.gs1.org/company-prefix
+  """
+  @spec lookup_gs1_prefix(integer) :: {atom, String.t()}
+  def lookup_gs1_prefix(number) do
+    case number do
+      x when x in 001..019 -> {:ok, "GS1 US"}
+      x when x in 030..039 -> {:ok, "GS1 US"}
+      x when x in 050..059 -> {:ok, "GS1 US"}
+      x when x in 060..139 -> {:ok, "GS1 US"}
+      x when x == 535 -> {:ok, "GS1 Malta"}
+      _ -> {:error, "No GS1 prefix found"}
+    end
+
+  end
 end

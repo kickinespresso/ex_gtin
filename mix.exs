@@ -59,7 +59,8 @@ defmodule ExGtin.Mixfile do
 
   defp description do
      """
-       Elixir GTIN Validation Library.
+       Elixir GTIN Validation Library for GS1, UPC-12, and GLN.
+       Validates GTIN-8, GTIN-12 (UPC-12), GTIN-13 (GLN), GTIN-14 codes.
      """
   end
 end
