@@ -10,6 +10,9 @@ A GTIN (Global Trade Item Number) Validation Library in Elixir under the GS1 spe
 ## Features
 
 - Supports GTIN-8, GTIN-12 (UPC-12), GTIN-13 (GLN), GTIN-14, GSIN, SSCC codes
+- Generate GTIN
+- Check GTIN validity 
+- Lookup GS1 country prefix
 
 ## Usage
 
@@ -26,6 +29,11 @@ A GTIN (Global Trade Item Number) Validation Library in Elixir under the GS1 spe
       iex> ExGtin.generate_gtin("629104150021")
       "6291041500213"
 
+- Lookup GS1 Prefix 
+
+      iex> ExGtin.Validation.find_gs1_prefix_country("53523235")
+      {:ok, "GS1 Malta"}
+
 ### Using Strings, Arrays or Numbers
 
 - String
@@ -35,7 +43,7 @@ A GTIN (Global Trade Item Number) Validation Library in Elixir under the GS1 spe
 
 - Array of Integers    
 
-      iex> ExGtin.check_gtin([6,2,9,1,0,4,1,5,0,0,2,1,3])
+      iex> ExGtin.check_gtin([6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3])
       {:ok, "GTIN-13"}
 
 - Integer

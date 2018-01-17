@@ -9,7 +9,7 @@ defmodule ExGtin.ValidationTest do
   end
 
   test "gtin_check_digit function with valid number array" do
-    number = [6,2,9,1,0,4,1,5,0,0,2,1,3]
+    number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3]
     assert {:ok, "GTIN-13"} == gtin_check_digit(number)
   end
 
@@ -38,12 +38,12 @@ defmodule ExGtin.ValidationTest do
   end
 
   test "multiply_and_sum_array function" do
-    number = [6,2,9,1,0,4,1,5,0,0,2,1]
+    number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1]
     assert 57 == multiply_and_sum_array(number)
   end
 
   test "generate_check_digit function" do
-    number = [6,2,9,1,0,4,1,5,0,0,2,1]
+    number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1]
     assert 3 == generate_check_digit(number)
   end
 
@@ -53,10 +53,10 @@ defmodule ExGtin.ValidationTest do
 
   test "check_code_length function with valid codes" do
     codes = [
-      [1,2,3,4,5,6,7,8],
-      [1,2,3,4,5,6,7,8,9,10,11,12],
-      [1,2,3,4,5,6,7,8,9,10,11,12,13],
-      [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+      [1, 2, 3, 4, 5, 6, 7, 8],
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
     ]
 
     Enum.map(codes, fn(x) -> assert {:ok, "GTIN-#{length(x)}"} == check_code_length(x) end)
@@ -69,16 +69,16 @@ defmodule ExGtin.ValidationTest do
 
   test "generate_check_code_length function with valid codes" do
     codes = [
-      [1,2,3,4,5,6,7],
-      [1,2,3,4,5,6,7,8,9,10,11],
-      [1,2,3,4,5,6,7,8,9,10,11,12],
-      [1,2,3,4,5,6,7,8,9,10,11,12,13]
+      [1, 2, 3, 4, 5, 6, 7],
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
     ]
     Enum.map(codes, fn(x) -> assert {:ok, "GTIN-#{length(x) + 1}"} == generate_check_code_length(x) end)
   end
 
   test "generate_check_code_length function with invalid code" do
-    code = [1,2,3,4,5,6]
+    code = [1, 2, 3, 4, 5, 6]
     assert {:error, _} = generate_check_code_length(code)
   end
 
@@ -88,12 +88,17 @@ defmodule ExGtin.ValidationTest do
   end
 
   test "generate_gtin_code function with valid number array" do
-    number = [6,2,9,1,0,4,1,5,0,0,2,1]
+    number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1]
     assert "6291041500213" == generate_gtin_code(number)
   end
 
   test "generate_gtin_code function with valid number " do
-    number = 629104150021
+    number = 629_104_150_021
     assert "6291041500213" == generate_gtin_code(number)
+  end
+
+  test "find_gs1_prefix_country function with valid number " do
+    number = "53523235"
+    assert {:ok, "GS1 Malta"} == find_gs1_prefix_country(number)
   end
 end

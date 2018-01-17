@@ -43,6 +43,22 @@ defmodule ExGtin do
     generate_gtin_code(number)
   end
 
+  @doc """
+  Find the GS1 prefix country for a GTIN number
+  
+  Returns `{atom, String.t()}`
+
+  ## Examples
+
+      iex> ExGtin.gs1_prefix_country("53523235")
+      {:ok, "GS1 Malta"}
+
+      iex> ExGtin.gs1_prefix_country("6291041500214")
+      {:ok, "GS1 Emirates"}
+      
+      iex> ExGtin.gs1_prefix_country("9541041500214")
+      {:error, "No GS1 prefix found"}
+  """
   @spec gs1_prefix_country(String.t() | list(number)) :: {atom, String.t()}
   def gs1_prefix_country(number) do
     find_gs1_prefix_country(number)
