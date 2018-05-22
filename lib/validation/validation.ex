@@ -217,7 +217,7 @@ defmodule ExGtin.Validation do
 
       iex> ExGtin.Validation.find_gs1_prefix_country("6291041500214")
       {:ok, "GS1 Emirates"}
-      
+
       iex> ExGtin.Validation.find_gs1_prefix_country("9541041500214")
       {:error, "No GS1 prefix found"}
   """
@@ -235,8 +235,8 @@ defmodule ExGtin.Validation do
   @spec find_gs1_prefix_country(list(number)) :: {atom, String.t()}
   def find_gs1_prefix_country(number) do
     case check_code_length(number) do
-      {:ok, gtin_type} ->
-        {prefix, code} = Enum.split(number, 3)
+      {:ok, _gtin_type} ->
+        {prefix, _code} = Enum.split(number, 3)
         prefix
           |> Enum.join
           |> String.to_integer

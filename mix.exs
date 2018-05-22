@@ -3,7 +3,7 @@ defmodule ExGtin.Mixfile do
 
   def project do
     [app: :ex_gtin,
-      version: "0.3.0",
+      version: "0.3.1",
       elixir: "~> 1.4",
       description: description(),
       aliases: aliases(),
@@ -32,9 +32,9 @@ defmodule ExGtin.Mixfile do
 
   defp deps do
     [
-      {:credo, "~> 0.9.0-rc1", only: [:dev, :test]},
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.8", only: :test}
+      {:credo, "~> 0.9.2", only: [:dev, :test]},
+      {:ex_doc, "~> 0.18.3", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.8.2", only: :test}
     ]
   end
 

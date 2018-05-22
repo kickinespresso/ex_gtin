@@ -14,7 +14,7 @@ defmodule ExGtin.ValidationTest do
   end
 
   test "gtin_check_digit function with valid number " do
-    number = 6291041500213
+    number = 6_291_041_500_213
     assert {:ok, "GTIN-13"} == gtin_check_digit(number)
   end
 
@@ -63,7 +63,7 @@ defmodule ExGtin.ValidationTest do
   end
 
   test "check_code_length function with invalid code" do
-    code = [1,2,3,4,5,6,7]
+    code = [1, 2, 3, 4, 5, 6, 7]
     assert {:error, _} = check_code_length(code)
   end
 
@@ -74,7 +74,9 @@ defmodule ExGtin.ValidationTest do
       [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
       [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
     ]
-    Enum.map(codes, fn(x) -> assert {:ok, "GTIN-#{length(x) + 1}"} == generate_check_code_length(x) end)
+    Enum.map(codes, fn(x) ->
+      assert {:ok, "GTIN-#{length(x) + 1}"} == generate_check_code_length(x)
+    end)
   end
 
   test "generate_check_code_length function with invalid code" do
