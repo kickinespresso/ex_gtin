@@ -1,4 +1,7 @@
 defmodule ExGtinTest do
+  @moduledoc """
+  Library Tests
+  """
   use ExUnit.Case
   doctest ExGtin
   import ExGtin

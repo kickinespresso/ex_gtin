@@ -1,4 +1,7 @@
 defmodule ExGtin.ValidationTest do
+  @moduledoc """
+  Validation Module Test
+  """
   use ExUnit.Case
   doctest ExGtin.Validation
   import ExGtin.Validation
