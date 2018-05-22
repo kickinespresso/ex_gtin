@@ -66,8 +66,6 @@ end
 - [GTIN](https://www.gs1.org)
 - [How to calculate GTIN](https://www.gs1.org/how-calculate-check-digit-manually)
 
-
-
 Documentation can be found at [https://hexdocs.pm/ex_gtin](https://hexdocs.pm/ex_gtin) on [HexDocs](https://hexdocs.pm).
 
 ## Tests
@@ -97,3 +95,8 @@ Please refer to the [Code of Conduct](CODE_OF_CONDUCT.md) for details
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+
+## Publish
+
+    mix hex.publish
