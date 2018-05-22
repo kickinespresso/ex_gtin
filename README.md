@@ -5,7 +5,7 @@
 
 # ExGtin
 
-A GTIN (Global Trade Item Number) Validation Library in Elixir under the GS1 specification.
+A GTIN (Global Trade Item Number) & UPC Generation and  Validation Library in Elixir under the GS1 specification.
 
 ## Features
 

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 ### Changed - 2018-05-21
+- Adding UPC to description in README.md - @cdesch
 - Adding Module Docs - @cdesch
 - Fixing Readme Link for MIT license badge - @cdesch
 
