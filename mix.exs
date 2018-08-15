@@ -1,9 +1,12 @@
 defmodule ExGtin.Mixfile do
+  @moduledoc """
+  ExGtin `mix.exs`
+  """
   use Mix.Project
 
   def project do
     [app: :ex_gtin,
-      version: "0.3.3",
+      version: "0.3.4",
       elixir: "~> 1.4",
       description: description(),
       aliases: aliases(),

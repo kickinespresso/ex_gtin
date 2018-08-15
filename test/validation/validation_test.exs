@@ -6,32 +6,35 @@ defmodule ExGtin.ValidationTest do
   doctest ExGtin.Validation
   import ExGtin.Validation
 
-  test "gtin_check_digit function with valid number string" do
-    number = "6291041500213"
-    assert {:ok, "GTIN-13"} == gtin_check_digit(number)
+  describe "gtin_check_digit function" do
+    test "with valid number string" do
+      number = "6291041500213"
+      assert {:ok, "GTIN-13"} == gtin_check_digit(number)
+    end
+
+    test "with valid number array" do
+      number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3]
+      assert {:ok, "GTIN-13"} == gtin_check_digit(number)
+    end
+
+    test "with valid number " do
+      number = 6_291_041_500_213
+      assert {:ok, "GTIN-13"} == gtin_check_digit(number)
+    end
+
+    test "with invalid number" do
+      number = "6291041500214"
+      assert {:error, "Invalid Code"} == gtin_check_digit(number)
+      assert {:error, "Invalid Code"} == gtin_check_digit("6291041533213")
+    end
+
+    test "with invalid length" do
+      number = "62910415002143232232"
+      assert {:error, "Invalid GTIN Code Length"} == gtin_check_digit(number)
+      assert {:error, _} = gtin_check_digit("62910415002143232232")
+    end
   end
 
-  test "gtin_check_digit function with valid number array" do
-    number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3]
-    assert {:ok, "GTIN-13"} == gtin_check_digit(number)
-  end
-
-  test "gtin_check_digit function with valid number " do
-    number = 6_291_041_500_213
-    assert {:ok, "GTIN-13"} == gtin_check_digit(number)
-  end
-
-  test "gtin_check_digit function with invalid number" do
-    number = "6291041500214"
-    assert {:error, "Invalid Code"} == gtin_check_digit(number)
-    assert {:error, "Invalid Code"} == gtin_check_digit("6291041533213")
-  end
-
-  test "gtin_check_digit function with invalid length" do
-    number = "62910415002143232232"
-    assert {:error, "Invalid GTIN Code Length"} == gtin_check_digit(number)
-    assert {:error, _} = gtin_check_digit("62910415002143232232")
-  end
 
   test "mult_by_index_code function" do
     assert mult_by_index_code(1) == 1
@@ -87,19 +90,21 @@ defmodule ExGtin.ValidationTest do
     assert {:error, _} = generate_check_code_length(code)
   end
 
-  test "generate_gtin_code function with valid number string" do
-    number = "629104150021"
-    assert "6291041500213" == generate_gtin_code(number)
-  end
+  describe "generate_gtin_code function" do
+    test "with valid number string" do
+      number = "629104150021"
+      assert "6291041500213" == generate_gtin_code(number)
+    end
 
-  test "generate_gtin_code function with valid number array" do
-    number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1]
-    assert "6291041500213" == generate_gtin_code(number)
-  end
+    test "with valid number array" do
+      number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1]
+      assert "6291041500213" == generate_gtin_code(number)
+    end
 
-  test "generate_gtin_code function with valid number " do
-    number = 629_104_150_021
-    assert "6291041500213" == generate_gtin_code(number)
+    test "with valid number " do
+      number = 629_104_150_021
+      assert "6291041500213" == generate_gtin_code(number)
+    end
   end
 
   test "find_gs1_prefix_country function with valid number " do

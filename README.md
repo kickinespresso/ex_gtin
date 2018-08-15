@@ -1,9 +1,9 @@
+# ExGtin
+
 [![Build Status](https://semaphoreci.com/api/v1/kickinespresso/ex_gtin/branches/master/badge.svg)](https://semaphoreci.com/kickinespresso/ex_gtin)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 [![Hex.pm](https://img.shields.io/hexpm/v/plug.svg)](https://www.hex.pm/packages/ex_gtin)
 [![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)](LICENSE.md)
-
-# ExGtin
 
 A GTIN (Global Trade Item Number) & UPC (Universal Price Code) Generation and  Validation Library in Elixir under the GS1 specification.
 
@@ -11,7 +11,7 @@ A GTIN (Global Trade Item Number) & UPC (Universal Price Code) Generation and  V
 
 - Supports GTIN-8, GTIN-12 (UPC-12), GTIN-13 (GLN), GTIN-14, GSIN, SSCC codes
 - Generate GTIN
-- Check GTIN validity 
+- Check GTIN validity
 - Lookup GS1 country prefix
 
 ## Installation
@@ -37,7 +37,7 @@ end
       iex> ExGtin.generate_gtin("629104150021")
       "6291041500213"
 
-- Lookup GS1 Prefix 
+- Lookup GS1 Prefix
 
       iex> ExGtin.Validation.find_gs1_prefix_country("53523235")
       {:ok, "GS1 Malta"}
@@ -49,7 +49,7 @@ end
       iex> ExGtin.check_gtin("6291041500213")
       {:ok, "GTIN-13"}
 
-- Array of Integers    
+- Array of Integers
 
       iex> ExGtin.check_gtin([6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3])
       {:ok, "GTIN-13"}
