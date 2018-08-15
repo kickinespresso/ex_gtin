@@ -18,7 +18,7 @@ A GTIN (Global Trade Item Number) & UPC (Universal Price Code) Generation and  V
 
 ```elixir
 def deps do
-  [{:ex_gtin, "~> 0.3.0"}]
+  [{:ex_gtin, "~> 0.3.3"}]
 end
 ```
 
