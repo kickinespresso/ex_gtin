@@ -104,6 +104,11 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 Please refer to the [Code of Conduct](CODE_OF_CONDUCT.md) for details
 
+## Security
+
+Please refer to the [Security](SECURITY.md) for details
+
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
