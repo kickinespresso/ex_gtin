@@ -18,7 +18,7 @@ A GTIN (Global Trade Item Number) & UPC (Universal Price Code) Generation and  V
 
 ```elixir
 def deps do
-  [{:ex_gtin, "~> 0.3.3"}]
+  [{:ex_gtin, "~> 0.4.0"}]
 end
 ```
 
@@ -26,15 +26,15 @@ end
 
 - Check GTIN codes
 
-      iex> ExGtin.check_gtin("6291041500213")
+      iex> ExGtin.validate("6291041500213")
       {:ok, "GTIN-13"}
 
-      iex> ExGtin.check_gtin("6291041500214")
+      iex> ExGtin.validate("6291041500214")
       {:error, "Invalid Code"}
 
 - Generate GTIN codes
 
-      iex> ExGtin.generate_gtin("629104150021")
+      iex> ExGtin.generate("629104150021")
       "6291041500213"
 
 - Lookup GS1 Prefix
@@ -46,17 +46,17 @@ end
 
 - String
 
-      iex> ExGtin.check_gtin("6291041500213")
+      iex> ExGtin.validate("6291041500213")
       {:ok, "GTIN-13"}
 
 - Array of Integers
 
-      iex> ExGtin.check_gtin([6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3])
+      iex> ExGtin.validate([6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3])
       {:ok, "GTIN-13"}
 
 - Integer
 
-      iex> ExGtin.check_gtin(6291041500213)
+      iex> ExGtin.validate(6291041500213)
       {:ok, "GTIN-13"}
 
     *Integers with leading zeros may not process properly*
@@ -74,11 +74,23 @@ Run tests with
 
     mix test
 
+Run test coverage
+
+    MIX_ENV=test mix coveralls
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
-When making pull requests, please be sure to update the [CHANGELOG.md](CHANGELOG.md) with the corresponding changes.
+When making pull requests, please be sure to update the [CHANGELOG.md](CHANGELOG.md) with the corresponding changes. Please make sure that all tests pass and that the static analysis checker `credo` is run.
+
+Run static code analysis
+
+    mix credo
+
+Generate Docs
+
+    mix docs
 
 ## Sponsors
 

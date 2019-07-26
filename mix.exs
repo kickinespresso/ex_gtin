@@ -5,8 +5,9 @@ defmodule ExGtin.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :ex_gtin,
-      version: "0.3.4",
+    [
+      app: :ex_gtin,
+      version: "0.4.0",
       elixir: "~> 1.4",
       description: description(),
       aliases: aliases(),
@@ -14,7 +15,6 @@ defmodule ExGtin.Mixfile do
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps(),
-      source_url: "https://github.com/kickinespresso/ex_gtin",
       test_coverage: [tool: ExCoveralls],
       coverallspreferred_cli_env: [
         "coveralls": :test,
@@ -22,6 +22,14 @@ defmodule ExGtin.Mixfile do
         "coveralls.post": :test,
         "coveralls.html": :test
       ],
+      # Docs
+      name: "ExGtin",
+      source_url: "https://github.com/kickinespresso/ex_gtin",
+      homepage_url: "https://github.com/kickinespresso/ex_gtin",
+      docs: [
+        main: "ExGtin",
+        extras: ["README.md"]
+      ]
    ]
   end
 
@@ -35,9 +43,9 @@ defmodule ExGtin.Mixfile do
 
   defp deps do
     [
-      {:credo, "~> 0.10.0", only: [:dev, :test]},
-      {:ex_doc, "~> 0.19.1", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.9.2", only: :test}
+      {:credo, "~> 1.1.2", only: [:dev, :test]},
+      {:ex_doc, "~> 0.21.1", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.11.1", only: :test}
     ]
   end
 

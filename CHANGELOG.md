@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2019-07-26
+
+- Deprecated `generate_gtin` for `generate`. `generate_gtin` will be removed in version `0.5.0` - @cdesch
+- Deprecated `check_gtin` for `validated`. `check_gtin` will be removed in version `0.5.0` - @cdesch
+- Validated Functionality with Elixir 1.9.1 and Elixir 1.7.4 - @cdesch
+- README Updates with additional information - @cdesch
+- Credo Fixes - @cdesch
+- Updating Credo from `0.10.0` to `1.1.2` - @cdesch
+- Updating Coveralls from `0.9.2` to `0.11.1` - @cdesch
+- Updating ExDocs from `0.19.1` to `0.21.1` - @cdesch
+
+TODO: Make functions private in the validation module
+
 ## [0.3.4] - 2018-08-15 (Not Published)
 
 - Adding `describe` groupings to tests - @cdesch

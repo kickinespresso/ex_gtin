@@ -35,7 +35,6 @@ defmodule ExGtin.ValidationTest do
     end
   end
 
-
   test "mult_by_index_code function" do
     assert mult_by_index_code(1) == 1
     assert mult_by_index_code(2) == 3
