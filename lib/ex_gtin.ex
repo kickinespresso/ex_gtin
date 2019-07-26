@@ -3,6 +3,9 @@ defmodule ExGtin do
   Documentation for ExGtin. This library provides
   functionality for validating GTIN compliant codes.
   """
+
+  import ExGtin.Validation
+
   @doc """
   Check for valid  GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
 
@@ -10,85 +13,99 @@ defmodule ExGtin do
 
   ## Examples
 
-      iex> ExGtin.gtin_check_digit("6291041500213")
-      {:ok}
+      iex> ExGtin.validate("6291041500213")
+      {:ok, "GTIN-13"}
 
-      iex> ExGtin.gtin_check_digit("6291041500214")
-      {:error}
+      iex> ExGtin.validate("6291041500214")
+      {:error, "Invalid Code"}
   """
-  @spec gtin_check_digit(string) :: {atom}
-  def gtin_check_digit(number) when is_bitstring(number) do
-    number
-      |> String.codepoints
-      |> Enum.map(fn(x) -> String.to_integer(x) end)
-      |> gtin_check_digit
+  @since "0.4.0"
+  @spec validate(String.t() | list(number)) :: {atom, String.t()}
+  def validate(number) do
+    gtin_check_digit(number)
   end
-
-  @spec gtin_check_digit(number) :: {atom}
-  def gtin_check_digit(number) when is_number(number), do: gtin_check_digit(Integer.digits(number))
-
-
-  @spec gtin_check_digit(list(number)) :: {atom}
-  def gtin_check_digit(number) do
-    {code, check_digit} = Enum.split(number, length(number) - 1)
-    calculated_check_digit = code
-      |> multiply_and_sum_array
-      |> subtract_from_nearest_multiple_of_ten
-
-    case calculated_check_digit == Enum.at(check_digit, 0) do
-      true -> {:ok}
-      _ -> {:error}
-    end
-  end
-
 
   @doc """
-  Calculates the sum of the digits in a string and multiplied value based on index order
+  Check for valid  GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
 
-  Returns sum of values
+  Returns `{:ok}` or `{:error}`
 
   ## Examples
 
-      iex> ExGtin.multiply_and_sum_array([6,2,9,1,0,4,1,5,0,0,2,1])
-      57
+      iex> ExGtin.check_gtin("6291041500213")
+      {:ok, "GTIN-13"}
 
+      iex> ExGtin.check_gtin("6291041500214")
+      {:error, "Invalid Code"}
   """
-  @spec multiply_and_sum_array(list(number)) :: number
-  def multiply_and_sum_array(numbers) do
-    numbers
-      |> Enum.reverse
-      |> Stream.with_index
-      |> Enum.reduce(0, fn({num, idx}, acc) ->
-        acc + (num * mult_by_index_code(idx))
-      end)
+  @deprecated "Use validate/1 instead. Will be removed in version 0.5.0"
+  @since "0.1.0"
+  @spec check_gtin(String.t() | list(number)) :: {atom, String.t()}
+  def check_gtin(number) do
+    gtin_check_digit(number)
   end
 
-
   @doc """
-  Calculates the difference of the highest rounded multiple of 10
+  Generates valid  GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
 
-  Returns the difference of the highest rounded multiple of 10
+  Returns code with check digit
 
   ## Examples
 
-      iex> ExGtin.subtract_from_nearest_multiple_of_ten(57)
-      3
+      iex> ExGtin.generate("629104150021")
+      "6291041500213"
+
+      iex> ExGtin.generate("62921")
+      {:error, "Invalid GTIN Code Length"}
 
   """
-  @spec subtract_from_nearest_multiple_of_ten(number) :: number
-  def subtract_from_nearest_multiple_of_ten(number) do
-    mod(10 - mod(number, 10), 10)
+  @since "0.4.0"
+  @spec generate(String.t() | list(number)) :: number | {atom, String.t()}
+  def generate(number) do
+    generate_gtin_code(number)
   end
 
-  def mult_by_index_code(index) do
-    case mod(index, 2) do
-      0 -> 3
-      _ -> 1
-    end
+  @doc """
+  Generates valid  GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
+
+  Returns code with check digit
+
+  ## Examples
+
+      iex> ExGtin.generate_gtin("629104150021")
+      "6291041500213"
+
+      iex> ExGtin.generate_gtin("62921")
+      {:error, "Invalid GTIN Code Length"}
+
+  """
+  @deprecated "Use generate/1 instead. Will be removed in version 0.5.0"
+  @since "0.1.0"
+  @spec generate_gtin(String.t() | list(number)) :: number | {atom, String.t()}
+  def generate_gtin(number) do
+    generate_gtin_code(number)
   end
 
-  defp mod(x,y) when x > 0, do: rem(x, y);
-  defp mod(x,y) when x < 0, do: rem(y+x, y);
-  defp mod(0,_y), do: 0
+  @doc """
+  Find the GS1 prefix country for a GTIN number
+
+  Returns `{atom, String.t()}`
+
+  ## Examples
+
+      iex> ExGtin.gs1_prefix_country("53523235")
+      {:ok, "GS1 Malta"}
+
+      iex> ExGtin.gs1_prefix_country("6291041500214")
+      {:ok, "GS1 Emirates"}
+
+      iex> ExGtin.gs1_prefix_country("9541041500214")
+      {:error, "No GS1 prefix found"}
+  """
+  @since "0.1.0"
+  @spec gs1_prefix_country(String.t() | list(number)) :: {atom, String.t()}
+  def gs1_prefix_country(number) do
+    find_gs1_prefix_country(number)
+  end
 
 end

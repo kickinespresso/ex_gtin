@@ -1,43 +1,117 @@
 defmodule ExGtinTest do
+  @moduledoc """
+  Library Tests
+  """
   use ExUnit.Case
   doctest ExGtin
   import ExGtin
 
-  test "gtin_check_digit function with valid number string" do
-    number = "6291041500213"
-    assert {:ok} == gtin_check_digit(number)
+  @valid_gtin_codes_arrays %{
+    codes: [
+      [1, 2, 3, 3, 1, 2, 3, 9],
+      [6, 4, 8, 2, 7, 1, 2, 3, 1, 2, 2, 0],
+      [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3],
+      [2, 2, 3, 1, 2, 3, 1, 2, 2, 3, 1, 2, 3, 5],
+   ]
+ }
+
+   describe "validate/1 function" do
+    test "with valid number string" do
+      number = "6291041500213"
+      assert {:ok, "GTIN-13"} == validate(number)
+    end
+
+    test "with valid number array" do
+      number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3]
+      assert {:ok, "GTIN-13"} == validate(number)
+    end
+
+    test "with valid number " do
+      number = 6_291_041_500_213
+      assert {:ok, "GTIN-13"} == validate(number)
+    end
+
+    test "with invalid number" do
+      number = "6291041500214"
+      assert {:error, _} = validate(number)
+      assert {:error, "Invalid Code"} == validate("6291041533213")
+    end
   end
 
-  test "gtin_check_digit function with valid number array" do
-    number = [6,2,9,1,0,4,1,5,0,0,2,1,3]
-    assert {:ok} == gtin_check_digit(number)
+  describe "check_gtin function" do
+    test "with valid number string" do
+      number = "6291041500213"
+      assert {:ok, "GTIN-13"} == check_gtin(number)
+    end
+
+    test "with valid number array" do
+      number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3]
+      assert {:ok, "GTIN-13"} == check_gtin(number)
+    end
+
+    test "with valid number " do
+      number = 6_291_041_500_213
+      assert {:ok, "GTIN-13"} == check_gtin(number)
+    end
+
+    test "with invalid number" do
+      number = "6291041500214"
+      assert {:error, _} = check_gtin(number)
+      assert {:error, "Invalid Code"} == check_gtin("6291041533213")
+    end
   end
 
-  test "gtin_check_digit function with valid number " do
-    number = 6291041500213
-    assert {:ok} == gtin_check_digit(number)
+  describe "generate/1 function" do
+    test "with valid number string" do
+      number = "629104150021"
+      assert "6291041500213" == generate(number)
+    end
+
+    test "with valid number array" do
+      number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1]
+      assert "6291041500213" == generate(number)
+    end
+
+    test "with valid number " do
+      number = 629_104_150_021
+      assert "6291041500213" == generate(number)
+    end
   end
 
-  test "gtin_check_digit function with invalid number" do
-    number = "6291041500214"
-    assert {:error} == gtin_check_digit(number)
-    assert {:error} == gtin_check_digit("6291041533213")
+  describe "generate_gtin function" do
+    test "with valid number string" do
+      number = "629104150021"
+      assert "6291041500213" == generate_gtin(number)
+    end
+
+    test "with valid number array" do
+      number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1]
+      assert "6291041500213" == generate_gtin(number)
+    end
+
+    test "with valid number " do
+      number = 629_104_150_021
+      assert "6291041500213" == generate_gtin(number)
+    end
   end
 
-  test "mult_by_index_code function" do
-    assert mult_by_index_code(1) == 1
-    assert mult_by_index_code(2) == 3
-    assert mult_by_index_code(3) == 1
-    assert mult_by_index_code(4) == 3
+  test "validate all gtin codes" do
+    Enum.map(@valid_gtin_codes_arrays[:codes],
+      fn(x) ->
+        assert {:ok, "GTIN-#{length(x)}"} == check_gtin(x)
+      end)
   end
 
-  test "multiply_and_sum_array function" do
-    #number = "629104150021"
-    number = [6,2,9,1,0,4,1,5,0,0,2,1]
-    assert 57 == multiply_and_sum_array(number)
+  describe "gs1_prefix_country function" do
+    test "with string" do
+      number = "53523235"
+      assert {:ok, "GS1 Malta"} == gs1_prefix_country(number)
+    end
+
+    test "with number" do
+      number = 53_523_235
+      assert {:ok, "GS1 Malta"} == gs1_prefix_country(number)
+    end
   end
 
-  test "subtract_from_nearest_multiple_of_ten function" do
-    assert 3 == subtract_from_nearest_multiple_of_ten(57)
-  end
 end
