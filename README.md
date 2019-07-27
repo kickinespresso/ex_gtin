@@ -5,7 +5,12 @@
 [![Hex.pm](https://img.shields.io/hexpm/v/plug.svg)](https://www.hex.pm/packages/ex_gtin)
 [![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)](LICENSE.md)
 
-A GTIN (Global Trade Item Number) & UPC (Universal Price Code) Generation and  Validation Library in Elixir under the GS1 specification.
+A [GTIN](https://www.gtin.info/) (Global Trade Item Number) & UPC (Universal Price Code) Generation and  Validation Library in Elixir under the GS1 specification.
+
+- GTIN-12 (UPC-A): this is a 12-digit number used primarily in North America
+- GTIN-8 (EAN/UCC-8): this is an 8-digit number used predominately outside of North America
+- GTIN-13 (EAN/UCC-13): this is a 13-digit number used predominately outside of North America
+- GTIN-14 (EAN/UCC-14 or ITF-14): this is a 14-digit number used to identify trade items at various packaging levels
 
 ## Features
 

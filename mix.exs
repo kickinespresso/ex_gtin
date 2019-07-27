@@ -72,6 +72,8 @@ defmodule ExGtin.Mixfile do
      """
        Elixir GTIN Validation Library for GS1, UPC-12, and GLN.
        Validates GTIN-8, GTIN-12 (UPC-12), GTIN-13 (GLN), GTIN-14 codes.
+       Global Trade Item Number (GTIN)
+       Universal Price Code (UPC)
      """
   end
 end
