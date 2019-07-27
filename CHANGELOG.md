@@ -7,8 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [0.4.0] - 2019-07-26
 
-- Deprecated `generate_gtin` for `generate`. `generate_gtin` will be removed in version `0.5.0` - @cdesch
-- Deprecated `check_gtin` for `validated`. `check_gtin` will be removed in version `0.5.0` - @cdesch
+- Deprecated `generate_gtin` for `generate`. `generate_gtin` will be removed in version `1.0.0` - @cdesch
+- Deprecated `check_gtin` for `validated`. `check_gtin` will be removed in version `1.0.0` - @cdesch
 - Validated Functionality with Elixir 1.9.1 and Elixir 1.7.4 - @cdesch
 - README Updates with additional information - @cdesch
 - Credo Fixes - @cdesch

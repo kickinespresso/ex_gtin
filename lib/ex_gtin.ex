@@ -38,7 +38,7 @@ defmodule ExGtin do
       iex> ExGtin.check_gtin("6291041500214")
       {:error, "Invalid Code"}
   """
-  @deprecated "Use validate/1 instead. Will be removed in version 0.5.0"
+  @deprecated "Use validate/1 instead. Will be removed in version 1.0.0"
   @since "0.1.0"
   @spec check_gtin(String.t() | list(number)) :: {atom, String.t()}
   def check_gtin(number) do
@@ -79,7 +79,7 @@ defmodule ExGtin do
       {:error, "Invalid GTIN Code Length"}
 
   """
-  @deprecated "Use generate/1 instead. Will be removed in version 0.5.0"
+  @deprecated "Use generate/1 instead. Will be removed in version 1.0.0"
   @since "0.1.0"
   @spec generate_gtin(String.t() | list(number)) :: number | {atom, String.t()}
   def generate_gtin(number) do
