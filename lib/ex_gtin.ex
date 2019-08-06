@@ -28,6 +28,25 @@ defmodule ExGtin do
   @doc """
   Check for valid  GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
 
+  Throws ArgumentError if an error occurs
+
+  ## Examples
+
+      iex> ExGtin.validate!("6291041500213")
+      "GTIN-13"
+  """
+  @since "1.0.0"
+  @spec validate!(String.t() | list(number)) :: {atom, String.t()}
+  def validate!(number) do
+     case gtin_check_digit(number) do
+      {:ok, result} -> result
+      {:error, reason} -> raise ArgumentError, message: reason
+    end
+  end
+
+  @doc """
+  Check for valid  GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
+
   Returns `{:ok}` or `{:error}`
 
   ## Examples
@@ -38,7 +57,7 @@ defmodule ExGtin do
       iex> ExGtin.check_gtin("6291041500214")
       {:error, "Invalid Code"}
   """
-  @deprecated "Use validate/1 instead. Will be removed in version 1.0.0"
+  @deprecated "Use validate/1 instead. Will be removed in version 1.0.1"
   @since "0.1.0"
   @spec check_gtin(String.t() | list(number)) :: {atom, String.t()}
   def check_gtin(number) do
@@ -53,7 +72,7 @@ defmodule ExGtin do
   ## Examples
 
       iex> ExGtin.generate("629104150021")
-      "6291041500213"
+      {:ok, "6291041500213"}
 
       iex> ExGtin.generate("62921")
       {:error, "Invalid GTIN Code Length"}
@@ -62,7 +81,33 @@ defmodule ExGtin do
   @since "0.4.0"
   @spec generate(String.t() | list(number)) :: number | {atom, String.t()}
   def generate(number) do
-    generate_gtin_code(number)
+    case generate_gtin_code(number) do
+      {:ok, result} -> {:ok, result}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  @doc """
+  Generates valid  GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
+
+  Throws Argument Exception if there was an error
+
+  ## Examples
+
+      iex> ExGtin.generate!("629104150021")
+      "6291041500213"
+
+      iex> ExGtin.generate("62921")
+      {:error, "Invalid GTIN Code Length"}
+
+  """
+  @since "1.0.0"
+  @spec generate!(String.t() | list(number)) :: number | {atom, String.t()}
+  def generate!(number) do
+    case generate_gtin_code(number) do
+      {:ok, result} -> result
+      {:error, reason} -> raise ArgumentError, message: reason
+    end
   end
 
   @doc """
@@ -79,11 +124,14 @@ defmodule ExGtin do
       {:error, "Invalid GTIN Code Length"}
 
   """
-  @deprecated "Use generate/1 instead. Will be removed in version 1.0.0"
+  @deprecated "Use generate/1 instead. Will be removed in version 1.0.1"
   @since "0.1.0"
   @spec generate_gtin(String.t() | list(number)) :: number | {atom, String.t()}
   def generate_gtin(number) do
-    generate_gtin_code(number)
+    case generate_gtin_code(number) do
+      {:ok, result} -> result
+      {:error, reason} ->  {:error, reason}
+    end
   end
 
   @doc """

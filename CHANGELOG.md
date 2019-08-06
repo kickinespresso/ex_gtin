@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2019-08-06
+
+### Contains breaking changes*
+
+- *BREAKING CHANGE* `generate/1` - Formerly would return the result. It now returns the result in an atom e.g. `{:ok, "6291041500213"}`  - @cdesch
+- Added `generate!/1` - Raises `ArgumentError` if invalid  - @cdesch
+- Added `validate!/1`- Raises `ArgumentError` if invalid  - @cdesch
+- Deprecated `generate_gtin` for `generate`. `generate_gtin` will be removed in version `1.0.1` - @cdesch
+- Deprecated `check_gtin` for `validate`. `check_gtin` will be removed in version `1.0.1` - @cdesch
+- Updated README with changes
+- Fixed README markdown issues for code indentation
+
 ## [0.4.0] - 2019-07-26
 
 - Deprecated `generate_gtin` for `generate`. `generate_gtin` will be removed in version `1.0.0` - @cdesch

@@ -52,7 +52,7 @@ defmodule ExGtin.Validation do
   ## Examples
 
       iex> ExGtin.Validation.generate_gtin_code("629104150021")
-      "6291041500213"
+      {:ok, "6291041500213"}
 
       iex> ExGtin.Validation.generate_gtin_code("62921")
       {:error, "Invalid GTIN Code Length"}
@@ -74,9 +74,10 @@ defmodule ExGtin.Validation do
     case generate_check_code_length(number) do
       {:ok, _} ->
         check_digit = generate_check_digit(number)
-        number
+        result = number
          |> Enum.concat([check_digit])
          |> Enum.join
+        {:ok, result}
       {:error, error} -> {:error, error}
     end
   end
@@ -253,6 +254,7 @@ defmodule ExGtin.Validation do
 
   """
   @spec lookup_gs1_prefix(integer) :: {atom, String.t()}
+  #credo:disable-for-next-line
   def lookup_gs1_prefix(number) do
     case number do
       x when x in 001..019 -> {:ok, "GS1 US"}

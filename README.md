@@ -22,9 +22,11 @@ A [GTIN](https://www.gtin.info/) (Global Trade Item Number) & UPC (Universal Pri
 
 ## Installation
 
+*WARNING `1.0.0` contains breaking changes from `0.4.0`*
+
 ```elixir
 def deps do
-  [{:ex_gtin, "~> 0.4.0"}]
+  [{:ex_gtin, "~> 1.0.0"}]
 end
 ```
 
@@ -32,40 +34,70 @@ end
 
 - Check GTIN codes
 
-      iex> ExGtin.validate("6291041500213")
-      {:ok, "GTIN-13"}
+```elixir
+iex> ExGtin.validate("6291041500213")
+{:ok, "GTIN-13"}
 
-      iex> ExGtin.validate("6291041500214")
-      {:error, "Invalid Code"}
+iex> ExGtin.validate("6291041500214")
+{:error, "Invalid Code"}
+
+ex> ExGtin.validate!("6291041500213")
+"GTIN-13"
+```
+
+Pass GTIN numbers in as a String, Number or an Array
+
+```elixir
+iex> number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1,3]
+iex> ExGtin.validate(number)
+{:ok, "GTIN-13"}
+
+iex> number = 6_291_041_500_213
+iex> ExGtin.validate(number)
+{:ok, "GTIN-13"}
+```
 
 - Generate GTIN codes
 
-      iex> ExGtin.generate("629104150021")
-      "6291041500213"
+```elixir
+iex> ExGtin.generate("629104150021")
+{:ok, "6291041500213"}
+
+iex> ExGtin.generate!("629104150021")
+"6291041500213"
+```
 
 - Lookup GS1 Prefix
 
-      iex> ExGtin.Validation.find_gs1_prefix_country("53523235")
-      {:ok, "GS1 Malta"}
+```elixir
+iex> ExGtin.Validation.find_gs1_prefix_country("53523235")
+{:ok, "GS1 Malta"}
+```
 
 ### Using Strings, Arrays or Numbers
 
 - String
 
-      iex> ExGtin.validate("6291041500213")
-      {:ok, "GTIN-13"}
+```elixir
+iex> ExGtin.validate("6291041500213")
+{:ok, "GTIN-13"}
+```
 
 - Array of Integers
 
-      iex> ExGtin.validate([6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3])
-      {:ok, "GTIN-13"}
+```elixir
+iex> ExGtin.validate([6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3])
+{:ok, "GTIN-13"}
+```
 
 - Integer
 
-      iex> ExGtin.validate(6291041500213)
-      {:ok, "GTIN-13"}
+```elixir
+iex> ExGtin.validate(6291041500213)
+{:ok, "GTIN-13"}
+```
 
-    *Integers with leading zeros may not process properly*
+Integers with leading zeros may not process properly
 
 ## Reference
 
@@ -78,11 +110,15 @@ Documentation can be found at [https://hexdocs.pm/ex_gtin](https://hexdocs.pm/ex
 
 Run tests with
 
-    mix test
+```elixir
+mix test
+```
 
 Run test coverage
 
-    MIX_ENV=test mix coveralls
+```elixir
+MIX_ENV=test mix coveralls
+```
 
 ## Contributing
 
@@ -92,11 +128,15 @@ When making pull requests, please be sure to update the [CHANGELOG.md](CHANGELOG
 
 Run static code analysis
 
-    mix credo
+```elixir
+mix credo
+```
 
 Generate Docs
 
-    mix docs
+```elixir
+mix docs
+```
 
 ## Sponsors
 
@@ -114,11 +154,12 @@ Please refer to the [Code of Conduct](CODE_OF_CONDUCT.md) for details
 
 Please refer to the [Security](SECURITY.md) for details
 
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Publish
 
-    mix hex.publish
+```elixir
+mix hex.publish
+```

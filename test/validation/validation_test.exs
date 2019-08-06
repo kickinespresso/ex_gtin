@@ -89,20 +89,20 @@ defmodule ExGtin.ValidationTest do
     assert {:error, _} = generate_check_code_length(code)
   end
 
-  describe "generate_gtin_code function" do
+  describe "generate_gtin_code/1 function" do
     test "with valid number string" do
       number = "629104150021"
-      assert "6291041500213" == generate_gtin_code(number)
+      assert {:ok, "6291041500213"} == generate_gtin_code(number)
     end
 
     test "with valid number array" do
       number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1]
-      assert "6291041500213" == generate_gtin_code(number)
+      assert {:ok, "6291041500213"} == generate_gtin_code(number)
     end
 
     test "with valid number " do
       number = 629_104_150_021
-      assert "6291041500213" == generate_gtin_code(number)
+      assert {:ok, "6291041500213"} == generate_gtin_code(number)
     end
   end
 
