@@ -9,7 +9,7 @@ defmodule ExGtin do
   @doc """
   Check for valid  GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
 
-  Returns `{:ok}` or `{:error}`
+  Returns `{:ok, "GTIN-#"}` or `{:error}`
 
   ## Examples
 
