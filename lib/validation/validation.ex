@@ -20,9 +20,9 @@ defmodule ExGtin.Validation do
   @spec gtin_check_digit(String.t()) :: {atom, String.t()}
   def gtin_check_digit(number) when is_bitstring(number) do
     number
-      |> String.codepoints
-      |> Enum.map(fn(x) -> String.to_integer(x) end)
-      |> gtin_check_digit
+    |> String.codepoints()
+    |> Enum.map(&String.to_integer/1)
+    |> gtin_check_digit()
   end
 
   @spec gtin_check_digit(number) :: {atom, String.t()}
@@ -61,9 +61,9 @@ defmodule ExGtin.Validation do
   @spec generate_gtin_code(String.t()) :: String.t() | {atom, String.t()}
   def generate_gtin_code(number) when is_bitstring(number) do
     number
-      |> String.codepoints
-      |> Enum.map(fn(x) -> String.to_integer(x) end)
-      |> generate_gtin_code
+    |> String.codepoints()
+    |> Enum.map(&String.to_integer/1)
+    |> generate_gtin_code()
   end
 
   @spec generate_gtin_code(number) :: String.t() | {atom, String.t()}
@@ -74,9 +74,7 @@ defmodule ExGtin.Validation do
     case generate_check_code_length(number) do
       {:ok, _} ->
         check_digit = generate_check_digit(number)
-        result = number
-         |> Enum.concat([check_digit])
-         |> Enum.join
+        result = Enum.join(number ++ [check_digit])
         {:ok, result}
       {:error, error} -> {:error, error}
     end
@@ -93,11 +91,11 @@ defmodule ExGtin.Validation do
       3
 
   """
-  @spec generate_check_digit(list(number)) :: number
+  @spec generate_check_digit([number]) :: number
   def generate_check_digit(number) do
     number
-      |> multiply_and_sum_array
-      |> subtract_from_nearest_multiple_of_ten
+    |> multiply_and_sum_array()
+    |> subtract_from_nearest_multiple_of_ten()
   end
 
   @doc """
@@ -114,11 +112,11 @@ defmodule ExGtin.Validation do
   @spec multiply_and_sum_array(list(number)) :: number
   def multiply_and_sum_array(numbers) do
     numbers
-      |> Enum.reverse
-      |> Stream.with_index
-      |> Enum.reduce(0, fn({num, idx}, acc) ->
-        acc + (num * mult_by_index_code(idx))
-      end)
+    |> Enum.reverse()
+    |> Stream.with_index()
+    |> Enum.reduce(0, fn {num, idx}, acc ->
+      acc + (num * mult_by_index_code(idx))
+    end)
   end
 
   @doc """
@@ -133,9 +131,7 @@ defmodule ExGtin.Validation do
 
   """
   @spec subtract_from_nearest_multiple_of_ten(number) :: number
-  def subtract_from_nearest_multiple_of_ten(number) do
-    Integer.mod(10 - Integer.mod(number, 10), 10)
-  end
+  def subtract_from_nearest_multiple_of_ten(number), do: rem(10 - rem(number, 10), 10)
 
   @doc """
   By index, returns the corresponding value to multiply
@@ -153,12 +149,8 @@ defmodule ExGtin.Validation do
 
   """
   @spec mult_by_index_code(number) :: number
-  def mult_by_index_code(index) do
-    case Integer.mod(index, 2) do
-      0 -> 3
-      _ -> 1
-    end
-  end
+  def mult_by_index_code(index) when rem(index, 2) == 1, do: 1
+  def mult_by_index_code(_), do: 3
 
   @doc """
   Checks the code for the proper length as specified by the
@@ -175,7 +167,7 @@ defmodule ExGtin.Validation do
       {:error, "Invalid GTIN Code Length"}
 
   """
-  @spec check_code_length(list(number)) :: {atom, String.t()}
+  @spec check_code_length([number]) :: {atom, String.t()}
   def check_code_length(number) do
     case length(number) do
       8  -> {:ok, "GTIN-8"}
@@ -225,9 +217,9 @@ defmodule ExGtin.Validation do
   @spec find_gs1_prefix_country(String.t()) :: {atom, String.t()}
   def find_gs1_prefix_country(number) when is_bitstring(number) do
     number
-      |> String.codepoints
-      |> Enum.map(fn(x) -> String.to_integer(x) end)
-      |> find_gs1_prefix_country
+    |> String.codepoints()
+    |> Enum.map(&String.to_integer/1)
+    |> find_gs1_prefix_country()
   end
 
   @spec find_gs1_prefix_country(number) :: {atom, String.t()}
