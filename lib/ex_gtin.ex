@@ -6,6 +6,8 @@ defmodule ExGtin do
 
   import ExGtin.Validation
 
+  @type result :: {:ok, binary} | {:error, binary}
+
   @doc """
   Check for valid  GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
 
@@ -20,10 +22,33 @@ defmodule ExGtin do
       {:error, "Invalid Code"}
   """
   @since "0.4.0"
-  @spec validate(String.t() | list(number)) :: {atom, String.t()}
+  @spec validate(String.t() | list(number)) :: result
   def validate(number) do
     gtin_check_digit(number)
   end
+
+  @doc """
+  Converts a gtin or isbn to gtin-14 format
+  """
+  @spec normalize(binary | list(number)) :: result
+  def normalize(gtin) do
+    with {:ok, type} <- do_gtin_check_digit(gtin),
+      do: {:ok, normalize_gtin(gtin, type)}
+  end
+
+  defp do_gtin_check_digit(isbn) when byte_size(isbn) == 10, do: {:ok, "ISBN-10"}
+  defp do_gtin_check_digit(gtin), do: gtin_check_digit(gtin)
+
+  defp normalize_gtin(gtin, "GTIN-8"), do: "000000#{gtin}"
+  defp normalize_gtin(gtin, "ISBN-10") do
+    digits = String.codepoints(gtin) |> Enum.map(&String.to_integer/1)
+    {code, _} = Enum.split(digits, 9)
+
+    "0978#{Enum.join(code)}#{generate_check_digit([9, 7, 8] ++ code)}"
+  end
+  defp normalize_gtin(gtin, "GTIN-12"), do: "00#{gtin}"
+  defp normalize_gtin(gtin, "GTIN-13"), do: "0#{gtin}"
+  defp normalize_gtin(gtin, "GTIN-14"), do: gtin
 
   @doc """
   Check for valid  GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
