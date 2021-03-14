@@ -7,7 +7,7 @@ defmodule ExGtin.Mixfile do
   def project do
     [
       app: :ex_gtin,
-      version: "1.0.0",
+      version: "1.0.1",
       elixir: "~> 1.4",
       description: description(),
       aliases: aliases(),
@@ -20,6 +20,9 @@ defmodule ExGtin.Mixfile do
         "coveralls.detail": :test,
         "coveralls.post": :test,
         "coveralls.html": :test
+      ],
+      preferred_cli_env: [
+        "pull_request_checkout.task": :test
       ],
       # Docs
       name: "ExGtin",
@@ -42,9 +45,9 @@ defmodule ExGtin.Mixfile do
 
   defp deps do
     [
-      {:credo, "~> 1.1.2", only: [:dev, :test]},
-      {:ex_doc, "~> 0.21.1", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.11.1", only: :test}
+      {:credo, "~> 1.5.5", only: [:dev, :test]},
+      {:ex_doc, "~> 0.23.0", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.14.0", only: :test}
     ]
   end
 
@@ -63,7 +66,7 @@ defmodule ExGtin.Mixfile do
         "test",
         "credo --strict",
         "coveralls"
-      ]
+      ],
     ]
   end
 

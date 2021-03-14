@@ -24,10 +24,18 @@ A [GTIN](https://www.gtin.info/) (Global Trade Item Number) & UPC (Universal Pri
 
 *WARNING `1.0.0` contains breaking changes from `0.4.0`*
 
+Add `:ex_gtin` as a dependency to your project's `mix.exs`:
+
 ```elixir
 def deps do
-  [{:ex_gtin, "~> 1.0.0"}]
+  [{:ex_gtin, "~> 1.0.1"}]
 end
+```
+
+and run `mix deps.get` to install the `:ex_gtin` dependency
+
+```bash
+mix deps.get
 ```
 
 ## Usage
@@ -91,7 +99,7 @@ iex> ExGtin.validate([6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3])
 ```
 
 - Integer
-
+k
 ```elixir
 iex> ExGtin.validate(6291041500213)
 {:ok, "GTIN-13"}
@@ -124,18 +132,24 @@ MIX_ENV=test mix coveralls
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
-When making pull requests, please be sure to update the [CHANGELOG.md](CHANGELOG.md) with the corresponding changes. Please make sure that all tests pass and that the static analysis checker `credo` is run.
+When making pull requests, please be sure to update the [CHANGELOG.md](CHANGELOG.md) with the corresponding changes. Please make sure that all tests pass, add tests for new functionality and that the static analysis checker `credo` is run. Use `mix pull_request_checkout.task` to ensure that everything checks out.
 
 Run static code analysis
 
-```elixir
+```bash
 mix credo
 ```
 
 Generate Docs
 
-```elixir
+```bash
 mix docs
+```
+
+Run the gambit of tests, static analysis and coverage
+
+```bash
+mix pull_request_checkout.task
 ```
 
 ## Sponsors
@@ -158,7 +172,7 @@ Please refer to the [Security](SECURITY.md) for details
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
-## Publish
+## Publish & Releasing
 
 ```elixir
 mix hex.publish

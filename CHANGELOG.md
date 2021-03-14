@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2021-03-14
+
+- Bumping version from `1.0.0` to `1.0.1`
+- Update dependenciens `credo`, `excoveralls` and `ex_doc` to the latest versions
+- Add installation instructions to readme.md
+- Testing with elixir 1.11.3
+- Remove deperated functions `check_gtin` and `generate_gtin`
+- Remove tests associated with `check_gtin` and `generate_gtin`
+- Convert `@since` to `@doc since:` for `ex_doc`
+- Add proper `@doc since: "1.0.0"` to `validation.ex`
+- Add `preferred_cli_env` as `:test` for `pull_request_checkout.task` task
+
 ## [1.0.0] - 2019-08-06
 
 ### Contains breaking changes*

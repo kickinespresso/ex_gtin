@@ -3,6 +3,7 @@ defmodule ExGtin.Validation do
   Documentation for ExGtin. This library provides
   functionality for validating GTIN compliant codes.
   """
+  @moduledoc since: "1.0.0"
 
   @doc """
   Check for valid  GTIN-8, GTIN-12, GTIN-13, GTIN-14, GSIN, SSCC codes
@@ -17,6 +18,7 @@ defmodule ExGtin.Validation do
       iex> ExGtin.Validation.gtin_check_digit("6291041500214")
       {:error, "Invalid Code"}
   """
+  @doc since: "1.0.0"
   @spec gtin_check_digit(String.t()) :: {atom, String.t()}
   def gtin_check_digit(number) when is_bitstring(number) do
     number
@@ -58,6 +60,7 @@ defmodule ExGtin.Validation do
       {:error, "Invalid GTIN Code Length"}
 
   """
+  @doc since: "1.0.0"
   @spec generate_gtin_code(String.t()) :: String.t() | {atom, String.t()}
   def generate_gtin_code(number) when is_bitstring(number) do
     number
@@ -93,6 +96,7 @@ defmodule ExGtin.Validation do
       3
 
   """
+  @doc since: "1.0.0"
   @spec generate_check_digit(list(number)) :: number
   def generate_check_digit(number) do
     number
@@ -111,6 +115,7 @@ defmodule ExGtin.Validation do
       57
 
   """
+  @doc since: "1.0.0"
   @spec multiply_and_sum_array(list(number)) :: number
   def multiply_and_sum_array(numbers) do
     numbers
@@ -132,6 +137,7 @@ defmodule ExGtin.Validation do
       3
 
   """
+  @doc since: "1.0.0"
   @spec subtract_from_nearest_multiple_of_ten(number) :: number
   def subtract_from_nearest_multiple_of_ten(number) do
     Integer.mod(10 - Integer.mod(number, 10), 10)
@@ -152,6 +158,7 @@ defmodule ExGtin.Validation do
       3
 
   """
+  @doc since: "1.0.0"
   @spec mult_by_index_code(number) :: number
   def mult_by_index_code(index) do
     case Integer.mod(index, 2) do
@@ -175,6 +182,7 @@ defmodule ExGtin.Validation do
       {:error, "Invalid GTIN Code Length"}
 
   """
+  @doc since: "1.0.0"
   @spec check_code_length(list(number)) :: {atom, String.t()}
   def check_code_length(number) do
     case length(number) do
@@ -203,6 +211,7 @@ defmodule ExGtin.Validation do
       {:error, "Invalid GTIN Code Length"}
 
   """
+  @doc since: "1.0.0"
   @spec generate_check_code_length(list(number)) :: {atom, String.t()}
   def generate_check_code_length(number), do: check_code_length(number ++ [1])
 
@@ -222,6 +231,7 @@ defmodule ExGtin.Validation do
       iex> ExGtin.Validation.find_gs1_prefix_country("9541041500214")
       {:error, "No GS1 prefix found"}
   """
+  @doc since: "1.0.0"
   @spec find_gs1_prefix_country(String.t()) :: {atom, String.t()}
   def find_gs1_prefix_country(number) when is_bitstring(number) do
     number
@@ -253,6 +263,7 @@ defmodule ExGtin.Validation do
   Returns {atom, String.t()}
 
   """
+  @doc since: "1.0.0"
   @spec lookup_gs1_prefix(integer) :: {atom, String.t()}
   #credo:disable-for-next-line
   def lookup_gs1_prefix(number) do

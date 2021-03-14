@@ -21,7 +21,7 @@ Please note we have a code of conduct, please follow it in all your interactions
 
 or
 
-    MIX_ENV=test mix pull_request_checkout.task
+    mix pull_request_checkout.task
 
 ## Code of Conduct
 
