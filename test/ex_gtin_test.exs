@@ -48,7 +48,6 @@ defmodule ExGtinTest do
       assert {:ok, "GTIN-14"} == validate(number)
     end
 
-
     test "with invalid number" do
       number = "6291041500214"
       assert {:error, _} = validate(number)
