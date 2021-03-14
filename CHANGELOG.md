@@ -7,15 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.0.1] - 2021-03-14
 
-- Bumping version from `1.0.0` to `1.0.1`
-- Update dependenciens `credo`, `excoveralls` and `ex_doc` to the latest versions
-- Add installation instructions to readme.md
-- Testing with elixir 1.11.3
-- Remove deperated functions `check_gtin` and `generate_gtin`
-- Remove tests associated with `check_gtin` and `generate_gtin`
-- Convert `@since` to `@doc since:` for `ex_doc`
-- Add proper `@doc since: "1.0.0"` to `validation.ex`
-- Add `preferred_cli_env` as `:test` for `pull_request_checkout.task` task
+- Bumping version from `1.0.0` to `1.0.1` - @cdesch
+- Update dependenciens `credo`, `excoveralls` and `ex_doc` to the latest versions - @cdesch
+- Add installation instructions to readme.md - @cdesch
+- Testing with elixir 1.11.3 - @cdesch
+- Remove deperated functions `check_gtin` and `generate_gtin` - *Please use `validate/1` and `generate/1` instead* - @cdesch
+- Remove tests associated with `check_gtin` and `generate_gtin` - *Please use `validate/1` and `generate/1` instead* - @cdesch
+- Convert `@since` to `@doc since:` for `ex_doc` - @cdesch
+- Add proper `@doc since: "1.0.0"` to `validation.ex` - @cdesch
+- Add `preferred_cli_env` as `:test` for `pull_request_checkout.task` task - @cdesch
 
 ## [1.0.0] - 2019-08-06
 

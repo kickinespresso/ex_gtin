@@ -22,6 +22,7 @@ A [GTIN](https://www.gtin.info/) (Global Trade Item Number) & UPC (Universal Pri
 
 ## Installation
 
+*WARNING `1.0.1` contains breaking changes from `1.0.0`* (I know this is a patch release but the breaking changes related to the deprecation of `check_gtin` and `generate_gtin` were noted in the changelog and docs over a year ago)
 *WARNING `1.0.0` contains breaking changes from `0.4.0`*
 
 Add `:ex_gtin` as a dependency to your project's `mix.exs`:
@@ -99,7 +100,7 @@ iex> ExGtin.validate([6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3])
 ```
 
 - Integer
-k
+
 ```elixir
 iex> ExGtin.validate(6291041500213)
 {:ok, "GTIN-13"}

@@ -1,3 +1,5 @@
+# ex_gtin License
+
 Copyright 2017-2021 Kickin Espresso
 
 License Type: MIT
