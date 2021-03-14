@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.0.3] - Unreleased Changes
 
+- Add Pull Request template - @cdesch
+- Updating security Policy - (Not sure that we need this but whatever) - @cdesch
 - Fixing "contributions welcome" badge link - @cdesch
 - Replacing CI badges on README.md - @cdesch
 - Adding github ci for automated testing and removing semaphoreci - @cdesch
