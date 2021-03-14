@@ -12,7 +12,7 @@ Summary: Merged new function `normalize/1` and other refactoring thanks to the f
 
 Details:
 
-- Merged [7a1a0fc3f(https://github.com/hellonarrativ/ex_gtin/commit/7a1a0fc3f42f9eacd5de61f24cac0b9f3e52d1a7) from [fork](https://github.com/hellonarrativ/ex_gtin) - @cdesch
+- Merged [7a1a0fc3f](https://github.com/hellonarrativ/ex_gtin/commit/7a1a0fc3f42f9eacd5de61f24cac0b9f3e52d1a7) from [fork](https://github.com/hellonarrativ/ex_gtin) - @cdesch
 - Adding `normalize/1` and tests to convert a GTIN or ISBN to GTIN-14 format - Big Thanks to @michaeljguarino!
 - Update `gtin_check_digit`, `generate_gtin_code` to use capture operators `&` - Big Thanks to @michaeljguarino!
 - Add `()` to `generate_check_digit` functions - Big Thanks to @michaeljguarino!
