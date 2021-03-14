@@ -8,17 +8,23 @@
 
 A [GTIN](https://www.gtin.info/) (Global Trade Item Number) & UPC (Universal Price Code) Generation and  Validation Library in Elixir under the GS1 specification.
 
-- GTIN-12 (UPC-A): this is a 12-digit number used primarily in North America
 - GTIN-8 (EAN/UCC-8): this is an 8-digit number used predominately outside of North America
-- GTIN-13 (EAN/UCC-13): this is a 13-digit number used predominately outside of North America
+- GTIN-12 (UPC-A): this is a 12-digit number used primarily in North America
+- GTIN-13 (EAN/UCC-13): this is a 13-digit number used predominately outside of North America - Global Location Number (GLN)
 - GTIN-14 (EAN/UCC-14 or ITF-14): this is a 14-digit number used to identify trade items at various packaging levels
 
 ## Features
 
-- Supports GTIN-8, GTIN-12 (UPC-12), GTIN-13 (GLN), GTIN-14, GSIN, SSCC codes
+- Supports GTIN-8, GTIN-12 (UPC-12), GTIN-13 (GLN), GTIN-14
 - Generate GTIN
 - Check GTIN validity
 - Lookup GS1 country prefix
+- Convert (normalize) GTIN-13 to GTIN-14
+
+Features to Come:
+
+- Global Shipment Identification Number (GSIN)
+- Serial Shipping Container Code (SSCC)
 
 ## Installation
 
@@ -81,6 +87,13 @@ iex> ExGtin.generate!("629104150021")
 ```elixir
 iex> ExGtin.Validation.find_gs1_prefix_country("53523235")
 {:ok, "GS1 Malta"}
+```
+
+- Convert GTIN-13 to GTIN 14
+
+```elixir
+iex> ExGtin.normalize("6291041500213")
+{:ok, "06291041500213"}
 ```
 
 ### Using Strings, Arrays or Numbers

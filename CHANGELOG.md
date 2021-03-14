@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2021-03-14
+
+Summary: Merged new function `normalize/1` and other refactoring thanks to the fork [fork](https://github.com/hellonarrativ/ex_gtin)
+ and @michaeljguarino
+
+Details:
+
+- Merged [7a1a0fc3f(https://github.com/hellonarrativ/ex_gtin/commit/7a1a0fc3f42f9eacd5de61f24cac0b9f3e52d1a7) from [fork](https://github.com/hellonarrativ/ex_gtin) - @cdesch
+- Adding `normalize/1` and tests to convert a GTIN or ISBN to GTIN-14 format - Big Thanks to @michaeljguarino!
+- Update `gtin_check_digit`, `generate_gtin_code` to use capture operators `&` - Big Thanks to @michaeljguarino!
+- Add `()` to `generate_check_digit` functions - Big Thanks to @michaeljguarino!
+- Fix Formatting of `multiply_and_sum_array`, `subtract_from_nearest_multiple_of_ten`, `mult_by_index_code` and `find_gs1_prefix_country` - Big Thanks to @michaeljguarino!
+- Added tests for GTIN-8, GTIN-12, GTIN 14 - @cdesch
+
 ## [1.0.1] - 2021-03-14
 
 - Bumping version from `1.0.0` to `1.0.1` - @cdesch

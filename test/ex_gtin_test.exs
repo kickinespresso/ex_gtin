@@ -12,6 +12,8 @@ defmodule ExGtinTest do
       [6, 4, 8, 2, 7, 1, 2, 3, 1, 2, 2, 0],
       [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3],
       [2, 2, 3, 1, 2, 3, 1, 2, 2, 3, 1, 2, 3, 5],
+      [2, 2, 3, 1, 2, 3, 1, 2, 2, 3, 1, 2, 3, 5],
+      [1, 0, 6, 1, 4, 1, 4, 1, 0, 0, 0, 4, 1, 5]
     ]
   }
 
@@ -26,10 +28,26 @@ defmodule ExGtinTest do
       assert {:ok, "GTIN-13"} == validate(number)
     end
 
-    test "with valid number " do
+    test "with valid GTIN-8 number" do
+      number = 50_678_907
+      assert {:ok, "GTIN-8"} == validate(number)
+    end
+
+    test "with valid GTIN-12 number" do
+      number = 614_141_000_449
+      assert {:ok, "GTIN-12"} == validate(number)
+    end
+
+    test "with valid GTIN-13 number" do
       number = 6_291_041_500_213
       assert {:ok, "GTIN-13"} == validate(number)
     end
+
+    test "with valid GTIN-14 number" do
+      number = 10_614_141_000_415
+      assert {:ok, "GTIN-14"} == validate(number)
+    end
+
 
     test "with invalid number" do
       number = "6291041500214"
