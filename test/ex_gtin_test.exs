@@ -128,4 +128,31 @@ defmodule ExGtinTest do
     end
   end
 
+  describe "normalize/1 function" do
+
+    test "with valid gtin 8 string" do
+      number = "40170725"
+      assert {:ok, "00000040170725"} == normalize(number)
+    end
+
+    test "with valid isbn 10 string" do
+      number = "0205080057"
+      assert {:ok, "09780205080052"} == normalize(number)
+    end
+
+    test "with valid gtin 12 string" do
+      number = "840030222641"
+      assert {:ok, "00840030222641"} == normalize(number)
+    end
+
+    test "with valid gtin 13 string" do
+      number = "0840030222641"
+      assert {:ok, "00840030222641"} == normalize(number)
+    end
+
+    test "with valid gtin 14 string" do
+      number = "00840030222641"
+      assert {:ok, "00840030222641"} == normalize(number)
+    end
+  end
 end
