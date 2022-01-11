@@ -5,8 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [1.0.3] - Unreleased Changes
+## [1.1.0] - 2022-01-11
 
+- Adding test coverage
+- Fixing conflicting GS1 Codes 99 to 990 for "GS1 coupon identification"
+- Bump minumum version of Elixir to `1.12`
+- Update dependencies
+- Replace deprecated `use Mix.Config` to `import Mix.Config`
 - Add Pull Request template - @cdesch
 - Updating security Policy - (Not sure that we need this but whatever) - @cdesch
 - Fixing "contributions welcome" badge link - @cdesch

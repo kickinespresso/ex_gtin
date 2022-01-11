@@ -7,8 +7,8 @@ defmodule ExGtin.Mixfile do
   def project do
     [
       app: :ex_gtin,
-      version: "1.0.2",
-      elixir: "~> 1.4",
+      version: "1.1.0",
+      elixir: "~> 1.12",
       description: description(),
       aliases: aliases(),
       package: package(),
@@ -45,9 +45,9 @@ defmodule ExGtin.Mixfile do
 
   defp deps do
     [
-      {:credo, "~> 1.5.5", only: [:dev, :test]},
-      {:ex_doc, "~> 0.23.0", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.14.0", only: :test}
+      {:credo, "~> 1.6.1", only: [:dev, :test]},
+      {:ex_doc, "~> 0.27.0", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.14.4", only: :test}
     ]
   end
 
@@ -72,9 +72,8 @@ defmodule ExGtin.Mixfile do
 
   defp description do
      """
-       Elixir GTIN Validation Library for GS1, UPC-12, and GLN.
+       Elixir Global Trade Item Number (GTIN) Validation Library for GS1, UPC-12, and GLN.
        Validates GTIN-8, GTIN-12 (UPC-12), GTIN-13 (GLN), GTIN-14 codes.
-       Global Trade Item Number (GTIN)
        Universal Price Code (UPC)
      """
   end

@@ -263,11 +263,12 @@ defmodule ExGtin.Validation do
       x when x in 001..019 -> {:ok, "GS1 US"}
       x when x in 030..039 -> {:ok, "GS1 US"}
       x when x in 050..059 -> {:ok, "GS1 US"}
-      x when x in 060..139 -> {:ok, "GS1 US"}
+      x when x in 060..099 -> {:ok, "GS1 US"}
+      x when x in 100..139 -> {:ok, "GS1 US"}
       x when x == 535 -> {:ok, "GS1 Malta"}
-      x when x in 020..029 -> {:ok, "Used to issue restricted circulation numbers within a geographic region (MO defined)   "}
+      x when x in 020..029 -> {:ok, "Used to issue restricted circulation numbers within a geographic region (MO defined)"}
       x when x in 040..049 -> {:ok, "Used to issue GS1 restricted circulation numbers within a company"}
-      x when x in 200..299 -> {:ok, "Used to issue GS1 restricted circulation number within a geographic region (MO defined)"}
+      x when x in 200..299 -> {:ok, "Used to issue GS1 restricted circulation number within a geographic region (MO defined)"}
       x when x in 300..379 -> {:ok, "GS1 France"}
       x when x == 380 -> {:ok, "GS1 Bulgaria"}
       x when x == 383 -> {:ok, "GS1 Slovenija"}
@@ -356,9 +357,9 @@ defmodule ExGtin.Validation do
       x when x == 780 -> {:ok, "GS1 Chile"}
       x when x == 784 -> {:ok, "GS1 Paraguay"}
       x when x == 786 -> {:ok, "GS1 Ecuador"}
-      x when x in 789..790 -> {:ok, "GS1 Brasil  "}
-      x when x in 800..839 -> {:ok, "GS1 Italy  "}
-      x when x in 840..849 -> {:ok, "GS1 Spain  "}
+      x when x in 789..790 -> {:ok, "GS1 Brasil"}
+      x when x in 800..839 -> {:ok, "GS1 Italy"}
+      x when x in 840..849 -> {:ok, "GS1 Spain"}
       x when x == 850 -> {:ok, "GS1 Cuba"}
       x when x == 858 -> {:ok, "GS1 Slovakia"}
       x when x == 859 -> {:ok, "GS1 Czech"}
@@ -387,7 +388,7 @@ defmodule ExGtin.Validation do
       x when x in 978..979 -> {:ok, "Bookland (ISBN)"}
       x when x == 980 -> {:ok, "Refund receipts"}
       x when x in 981..984 -> {:ok, "GS1 coupon identification for common currency areas"}
-      x when x == 99 -> {:ok, "GS1 coupon identification"}
+      x when x in 990..999 -> {:ok, "GS1 coupon identification"}
       _ -> {:error, "No GS1 prefix found"}
     end
   end
