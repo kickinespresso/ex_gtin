@@ -34,7 +34,7 @@ Add `:ex_gtin` as a dependency to your project's `mix.exs`:
 
 ```elixir
 def deps do
-  [{:ex_gtin, "~> 1.0.2"}]
+  [{:ex_gtin, "~> 1.1.0"}]
 end
 ```
 
