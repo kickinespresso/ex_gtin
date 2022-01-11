@@ -259,5 +259,4 @@ defmodule ExGtin.ValidationTest do
     assert lookup_gs1_prefix(990) == {:ok, "GS1 coupon identification"}
   end
 
-
 end
