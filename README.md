@@ -55,7 +55,7 @@ iex> ExGtin.validate("6291041500213")
 iex> ExGtin.validate("6291041500214")
 {:error, "Invalid Code"}
 
-ex> ExGtin.validate!("6291041500213")
+iex> ExGtin.validate!("6291041500213")
 "GTIN-13"
 ```
 
