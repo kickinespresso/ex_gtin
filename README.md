@@ -153,7 +153,7 @@ Run static code analysis
 mix credo
 ```
 
-Generate Docs
+Generate Documentation
 
 ```bash
 mix docs
