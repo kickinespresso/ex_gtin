@@ -1,33 +1,31 @@
-name: Elixir CI
+name: Elixir Tests
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
+    branches:
+      - master # Or your default branch
 
 jobs:
-  build:
-
-    name: Build and test
+  test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Elixir
-      uses: erlef/setup-elixir@885971a72ed1f9240973bd92ab57af8c1aa68f24
-      with:
-        elixir-version: '1.12.3' # Define the elixir version [required]
-        otp-version: '22.3' # Define the OTP version [required]
-    - name: Restore dependencies cache
-      uses: actions/cache@v2
-      with:
-        path: deps
-        key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-        restore-keys: ${{ runner.os }}-mix-
-    - name: Install dependencies
-      run: mix deps.get
-    - name: Run tests
-      run: mix test
-    - name: Run Pull Request Checks
-      run: mix pull_request_checkout.task  
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.15"
+          otp-version: "26"
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Compile project
+        run: mix compile --warnings-as-errors
+
+      - name: Run tests
+        env:
+          MIX_ENV: test
+        run: mix test

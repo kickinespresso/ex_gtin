@@ -8,7 +8,7 @@ defmodule ExGtin.Mixfile do
     [
       app: :ex_gtin,
       version: "1.2.0",
-      elixir: "~> 1.12",
+      elixir: "~> 1.15",
       description: description(),
       aliases: aliases(),
       package: package(),

@@ -5,11 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [1.2.0] - 2025-04-14
+## [1.2.0] - 2025-04-18
 
+- Updated min Elixir version to 1.15. Tested successfully with 1.18.3, 1.16, and 1.15.
 - Fixed incorrect GS1 Code handling as noted in issue `#2`
-- Fixed normalize function to add correct GTIN-14 indicator digit prefix as a default of `1`
-  - Updarted Cooresponding DocTests
+- Fixed normalize/1 function to add correct GTIN-14 indicator digit prefix as a default of `1`
+  - Updated corresponding DocTests and tests
 - Added tests and corrected bad tests that were validating bad checks
 - Added tests for edge cases and checks for error handling
 - Fixed incorrect `@spec` for `validate!`
