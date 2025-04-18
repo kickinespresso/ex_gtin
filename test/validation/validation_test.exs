@@ -69,7 +69,7 @@ defmodule ExGtin.ValidationTest do
       [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
     ]
 
-    Enum.map(codes, fn(x) -> assert {:ok, "GTIN-#{length(x)}"} == check_code_length(x) end)
+    Enum.map(codes, fn x -> assert {:ok, "GTIN-#{length(x)}"} == check_code_length(x) end)
   end
 
   test "check_code_length function with invalid code" do
@@ -84,7 +84,8 @@ defmodule ExGtin.ValidationTest do
       [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
       [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
     ]
-    Enum.map(codes, fn(x) ->
+
+    Enum.map(codes, fn x ->
       assert {:ok, "GTIN-#{length(x) + 1}"} == generate_check_code_length(x)
     end)
   end
@@ -134,9 +135,18 @@ defmodule ExGtin.ValidationTest do
     assert lookup_gs1_prefix(060) == {:ok, "GS1 US"}
     assert lookup_gs1_prefix(100) == {:ok, "GS1 US"}
     assert lookup_gs1_prefix(535) == {:ok, "GS1 Malta"}
-    assert lookup_gs1_prefix(020) == {:ok, "Used to issue restricted circulation numbers within a geographic region (MO defined)"}
-    assert lookup_gs1_prefix(040) == {:ok, "Used to issue GS1 restricted circulation numbers within a company"}
-    assert lookup_gs1_prefix(200) == {:ok, "Used to issue GS1 restricted circulation number within a geographic region (MO defined)"}
+
+    assert lookup_gs1_prefix(020) ==
+             {:ok,
+              "Used to issue restricted circulation numbers within a geographic region (MO defined)"}
+
+    assert lookup_gs1_prefix(040) ==
+             {:ok, "Used to issue GS1 restricted circulation numbers within a company"}
+
+    assert lookup_gs1_prefix(200) ==
+             {:ok,
+              "Used to issue GS1 restricted circulation number within a geographic region (MO defined)"}
+
     assert lookup_gs1_prefix(300) == {:ok, "GS1 France"}
     assert lookup_gs1_prefix(380) == {:ok, "GS1 Bulgaria"}
     assert lookup_gs1_prefix(383) == {:ok, "GS1 Slovenija"}
@@ -248,7 +258,11 @@ defmodule ExGtin.ValidationTest do
     assert lookup_gs1_prefix(930) == {:ok, "GS1 Australia"}
     assert lookup_gs1_prefix(940) == {:ok, "GS1 New Zealand"}
     assert lookup_gs1_prefix(950) == {:ok, "GS1 Global Office"}
-    assert lookup_gs1_prefix(951) == {:ok, "Used to issue General Manager Numbers for the EPC General Identifier (GID) scheme as defined by the EPC Tag Data Standard*"}
+
+    assert lookup_gs1_prefix(951) ==
+             {:ok,
+              "Used to issue General Manager Numbers for the EPC General Identifier (GID) scheme as defined by the EPC Tag Data Standard*"}
+
     assert lookup_gs1_prefix(955) == {:ok, "GS1 Malaysia"}
     assert lookup_gs1_prefix(958) == {:ok, "GS1 Macau"}
     assert lookup_gs1_prefix(960) == {:ok, "Global Office (GTIN-8s)*"}

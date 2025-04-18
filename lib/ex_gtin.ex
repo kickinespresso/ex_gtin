@@ -70,10 +70,10 @@ defmodule ExGtin do
       iex> ExGtin.validate!("6291041500213")
       "GTIN-13"
   """
-  @doc since: "1.0.0"
-  @spec validate!(String.t() | list(number)) :: {atom, String.t()}
+  @doc since: "1.2.0"
+  @spec validate!(String.t() | list(number)) :: String.t()
   def validate!(number) do
-     case gtin_check_digit(number) do
+    case gtin_check_digit(number) do
       {:ok, result} -> result
       {:error, reason} -> raise ArgumentError, message: reason
     end
@@ -146,5 +146,4 @@ defmodule ExGtin do
   def gs1_prefix_country(number) do
     find_gs1_prefix_country(number)
   end
-
 end

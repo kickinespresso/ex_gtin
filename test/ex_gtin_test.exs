@@ -17,7 +17,7 @@ defmodule ExGtinTest do
     ]
   }
 
-   describe "validate/1 function" do
+  describe "validate/1 function" do
     test "with valid number string" do
       number = "6291041500213"
       assert {:ok, "GTIN-13"} == validate(number)
