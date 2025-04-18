@@ -1,9 +1,10 @@
 # ExGtin
 
 ![CI Status](https://github.com/kickinespresso/ex_gtin/actions/workflows/elixir.yml/badge.svg)
-[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/kickinespresso/ex_gtin/issues)
-[![Hex.pm](https://img.shields.io/hexpm/v/plug.svg)](https://www.hex.pm/packages/ex_gtin)
+[![Static Badge](https://img.shields.io/badge/HexDocs-ex_gtin-blue)](https://hexdocs.pm/ex_gtin/ExGtin.html)
+[![Hex.pm Version](https://img.shields.io/hexpm/v/ex_gtin)](https://hex.pm/packages/ex_gtin)
 [![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)](LICENSE.md)
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/kickinespresso/ex_gtin/issues)
 
 A [GTIN](https://www.gtin.info/) (Global Trade Item Number) & UPC (Universal Price Code) Generation and Validation Library in Elixir under the GS1 specification.
 
