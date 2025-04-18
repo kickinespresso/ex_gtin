@@ -242,18 +242,29 @@ defmodule ExGtin.Validation do
   end
 
   @spec find_gs1_prefix_country(number) :: {atom, String.t()}
-  def find_gs1_prefix_country(number) when is_number(number), do: find_gs1_prefix_country(Integer.digits(number))
+  def find_gs1_prefix_country(number) when is_number(number),
+    do: find_gs1_prefix_country(Integer.digits(number))
 
   @spec find_gs1_prefix_country(list(number)) :: {atom, String.t()}
   def find_gs1_prefix_country(number) do
     case check_code_length(number) do
-      {:ok, _gtin_type} ->
-        {prefix, _code} = Enum.split(number, 3)
+      {:ok, gtin_type} ->
+        normalized =
+          case gtin_type do
+            "GTIN-12" -> [0] ++ number
+            "GTIN-14" -> Enum.drop(number, 1)
+            _ -> number
+          end
+
+        {prefix, _code} = Enum.split(normalized, 3)
+
         prefix
-          |> Enum.join
-          |> String.to_integer
-          |> lookup_gs1_prefix
-      {:error, error} -> {:error, error}
+        |> Enum.join()
+        |> String.to_integer()
+        |> lookup_gs1_prefix
+
+      {:error, error} ->
+        {:error, error}
     end
   end
 

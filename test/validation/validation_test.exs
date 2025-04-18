@@ -112,19 +112,81 @@ defmodule ExGtin.ValidationTest do
     end
   end
 
-  test "find_gs1_prefix_country function with valid number " do
-    number = "53523235"
-    assert {:ok, "GS1 Malta"} == find_gs1_prefix_country(number)
-  end
+  describe "find_gs1_prefix_country function" do
+    test "with valid number" do
+      number = "53523235"
+      assert {:ok, "GS1 Malta"} == find_gs1_prefix_country(number)
+    end
 
-  test "find_gs1_prefix_country function with invalid prefix code " do
-    number = "00023235"
-    assert {:error, "No GS1 prefix found"} == find_gs1_prefix_country(number)
-  end
+    test "with invalid prefix code" do
+      number = "00023235"
+      assert {:error, "No GS1 prefix found"} == find_gs1_prefix_country(number)
+    end
 
-  test "find_gs1_prefix_country function with invalid number " do
-    number = "00035"
-    assert {:error, "Invalid GTIN Code Length"} == find_gs1_prefix_country(number)
+    test "with invalid number" do
+      number = "00035"
+      assert {:error, "Invalid GTIN Code Length"} == find_gs1_prefix_country(number)
+    end
+
+    test "with GTIN-12 to add leading zero" do
+      test_cases = [
+        {"012345678905", "GTIN-12", "GS1 US"}
+      ]
+
+      Enum.each(test_cases, fn {number, format, expected} ->
+        result = find_gs1_prefix_country(number)
+
+        assert result == {:ok, expected},
+               "Expected #{format} #{number} to resolve to #{expected}, but got #{inspect(result)}"
+      end)
+    end
+
+    test "with GTIN-12, GTIN-13 and GTIN-14 for US formats for same GS1 prefix" do
+      test_cases = [
+        {"012345678905", "GTIN-12", "GS1 US"},
+        {"614141234561", "GTIN-13", "GS1 US"},
+        {"012345678905", "GTIN-13", "GS1 US"},
+        {"00400051091017", "GTIN-14",
+         "Used to issue GS1 restricted circulation numbers within a company"},
+        {"00500051091014", "GTIN-14", "GS1 US"}
+      ]
+
+      Enum.each(test_cases, fn {number, format, expected} ->
+        result = find_gs1_prefix_country(number)
+
+        assert result == {:ok, expected},
+               "Expected #{format} #{number} to resolve to #{expected}, but got #{inspect(result)}"
+      end)
+    end
+
+    test "with GTIN-13 and GTIN-14 for Germany formats for same GS1 prefix" do
+      test_cases = [
+        {"4051234567896", "GTIN-13", "GS1 Germany"},
+        {"4006381333931", "GTIN-13", "GS1 Germany"},
+        {"14006381333931", "GTIN-14", "GS1 Germany"},
+        {"94051234567896", "GTIN-14", "GS1 Germany"}
+      ]
+
+      Enum.each(test_cases, fn {number, format, expected} ->
+        result = find_gs1_prefix_country(number)
+
+        assert result == {:ok, expected},
+               "Expected #{format} #{number} to resolve to #{expected}, but got #{inspect(result)}"
+      end)
+    end
+
+    test "with GTIN-14 strip leading zero for Germany formats" do
+      test_cases = [
+        {"04000510910178", "GTIN-14", "GS1 Germany"}
+      ]
+
+      Enum.each(test_cases, fn {number, format, expected} ->
+        result = find_gs1_prefix_country(number)
+
+        assert result == {:ok, expected},
+               "Expected #{format} #{number} to resolve to #{expected}, but got #{inspect(result)}"
+      end)
+    end
   end
 
   test "lookup_gs1_prefix test country codes" do
@@ -273,4 +335,204 @@ defmodule ExGtin.ValidationTest do
     assert lookup_gs1_prefix(990) == {:ok, "GS1 coupon identification"}
   end
 
+  describe "integration tests" do
+    test "generate then validate GTIN-8" do
+      base = "1234567"
+      {:ok, generated} = generate_gtin_code(base)
+      assert {:ok, "GTIN-8"} == gtin_check_digit(generated)
+    end
+
+    test "generate then validate GTIN-12" do
+      base = "12345678901"
+      {:ok, generated} = generate_gtin_code(base)
+      assert {:ok, "GTIN-12"} == gtin_check_digit(generated)
+    end
+
+    test "generate then validate GTIN-13" do
+      base = "123456789012"
+      {:ok, generated} = generate_gtin_code(base)
+      assert {:ok, "GTIN-13"} == gtin_check_digit(generated)
+    end
+
+    test "generate then validate GTIN-14" do
+      base = "1234567890123"
+      {:ok, generated} = generate_gtin_code(base)
+      assert {:ok, "GTIN-14"} == gtin_check_digit(generated)
+    end
+
+    test "convert GTIN-8 to GTIN-13" do
+      gtin8 = "12345678"
+      # Convert to GTIN-13 by adding 5 leading zeros
+      gtin13 = "00000" <> gtin8
+      # Recalculate check digit
+      {:ok, converted} = generate_gtin_code(String.slice(gtin13, 0..11))
+      assert {:ok, "GTIN-13"} == gtin_check_digit(converted)
+    end
+
+    test "convert GTIN-13 to GTIN-14" do
+      gtin13 = "1234567890123"
+      # Convert to GTIN-14 by adding leading 1
+      gtin14 = "1" <> String.slice(gtin13, 0..11)
+      # Recalculate check digit
+      {:ok, converted} = generate_gtin_code(String.slice(gtin14, 0..12))
+      assert {:ok, "GTIN-14"} == gtin_check_digit(converted)
+    end
+
+    test "full conversion: GTIN-8 to GTIN-14" do
+      gtin8 = "12345678"
+      # First convert to GTIN-13
+      gtin13 = "00000" <> gtin8
+      {:ok, gtin13_with_check} = generate_gtin_code(String.slice(gtin13, 0..11))
+
+      # Then convert to GTIN-14
+      gtin14 = "1" <> String.slice(gtin13_with_check, 0..11)
+      {:ok, gtin14_with_check} = generate_gtin_code(String.slice(gtin14, 0..12))
+
+      assert {:ok, "GTIN-14"} == gtin_check_digit(gtin14_with_check)
+    end
+
+    test "find_gs1_prefix_country after validation" do
+      gtin = "6291041500213"
+      {:ok, _} = gtin_check_digit(gtin)
+      assert {:ok, "GS1 Emirates"} == find_gs1_prefix_country(gtin)
+    end
+  end
+
+  describe "normalize function tests" do
+    test "converts GTIN-8 to GTIN-14 correctly" do
+      gtin8 = "12345670"
+      {:ok, normalized} = ExGtin.normalize(gtin8)
+      assert normalized == "10000012345677"
+      assert {:ok, "GTIN-14"} == gtin_check_digit(normalized)
+    end
+
+    test "converts GTIN-12 to GTIN-14 correctly" do
+      gtin12 = "123456789012"
+      {:ok, normalized} = ExGtin.normalize(gtin12)
+      assert normalized == "10123456789019"
+      assert {:ok, "GTIN-14"} == gtin_check_digit(normalized)
+    end
+
+    test "converts GTIN-13 to GTIN-14 correctly" do
+      gtin13 = "1234567890128"
+      {:ok, normalized} = ExGtin.normalize(gtin13)
+      assert normalized == "11234567890125"
+      assert {:ok, "GTIN-14"} == gtin_check_digit(normalized)
+    end
+
+    test "leaves GTIN-14 unchanged" do
+      gtin14 = "12345678901231"
+      {:ok, normalized} = ExGtin.normalize(gtin14)
+      assert normalized == gtin14
+      assert {:ok, "GTIN-14"} == gtin_check_digit(normalized)
+    end
+
+    test "handles ISBN-10 conversion correctly" do
+      isbn = "0205080057"
+      {:ok, normalized} = ExGtin.normalize(isbn)
+      assert normalized == "09780205080052"
+      assert {:ok, "GTIN-14"} == gtin_check_digit(normalized)
+    end
+
+    test "rejects invalid GTIN-8" do
+      # Invalid check digit
+      invalid_gtin8 = "12345679"
+      assert {:error, "Invalid Code"} == ExGtin.normalize(invalid_gtin8)
+    end
+
+    test "rejects invalid GTIN-12" do
+      # Invalid check digit
+      invalid_gtin12 = "123456789013"
+      assert {:error, "Invalid Code"} == ExGtin.normalize(invalid_gtin12)
+    end
+
+    test "rejects invalid GTIN-13" do
+      # Invalid check digit
+      invalid_gtin13 = "1234567890124"
+      assert {:error, "Invalid Code"} == ExGtin.normalize(invalid_gtin13)
+    end
+
+    test "rejects invalid GTIN-14" do
+      # Invalid check digit
+      invalid_gtin14 = "12345678901235"
+      assert {:error, "Invalid Code"} == ExGtin.normalize(invalid_gtin14)
+    end
+  end
+
+  describe "edge cases for gtin_check_digit" do
+    test "with whitespace" do
+      assert_raise ArgumentError, fn ->
+        gtin_check_digit(" 6291041500213 ")
+      end
+
+      assert_raise ArgumentError, fn ->
+        gtin_check_digit("\t6291041500213\t")
+      end
+    end
+
+    test "with non-numeric characters" do
+      assert_raise ArgumentError, fn ->
+        gtin_check_digit("629104150021a")
+      end
+
+      assert_raise ArgumentError, fn ->
+        gtin_check_digit("629104150021!")
+      end
+    end
+
+    test "with empty string" do
+      assert {:error, "Invalid GTIN Code Length"} == gtin_check_digit("")
+    end
+
+    test "with very large numbers" do
+      # Test with a number that's too large for standard integer representation
+      assert {:error, "Invalid GTIN Code Length"} ==
+               gtin_check_digit("999999999999999999999999999999")
+    end
+
+    test "with negative numbers" do
+      assert_raise ArgumentError, fn ->
+        gtin_check_digit("-6291041500213")
+      end
+    end
+
+    test "with decimal numbers" do
+      assert_raise ArgumentError, fn ->
+        gtin_check_digit("629104150021.3")
+      end
+    end
+  end
+
+  describe "edge cases for find_gs1_prefix_country" do
+    test "with special prefixes in different formats" do
+      # ISBN-10 converted to GTIN-13
+      assert {:ok, "Bookland (ISBN)"} == find_gs1_prefix_country("9780205080052")
+      # ISSN converted to GTIN-13
+      assert {:ok, "Serial publications (ISSN)"} == find_gs1_prefix_country("9771234567003")
+    end
+  end
+
+  describe "edge cases for normalize" do
+    test "with ISBN-13 codes" do
+      isbn13 = "9780205080052"
+      assert {:ok, "19780205080059"} == ExGtin.normalize(isbn13)
+    end
+
+    test "with ISSN codes" do
+      issn = "9771234567003"
+      assert {:ok, "19771234567000"} == ExGtin.normalize(issn)
+    end
+
+    test "with UPC-A codes" do
+      upc = "012345678905"
+      assert {:ok, "10012345678902"} == ExGtin.normalize(upc)
+    end
+
+    test "with mixed format inputs" do
+      # GTIN-8 with ISBN-10 format
+      # Valid GTIN-8
+      mixed = "40170725"
+      assert {:ok, "10000040170722"} == ExGtin.normalize(mixed)
+    end
+  end
 end
