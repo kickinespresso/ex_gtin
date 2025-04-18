@@ -5,7 +5,7 @@
 [![Hex.pm](https://img.shields.io/hexpm/v/plug.svg)](https://www.hex.pm/packages/ex_gtin)
 [![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)](LICENSE.md)
 
-A [GTIN](https://www.gtin.info/) (Global Trade Item Number) & UPC (Universal Price Code) Generation and  Validation Library in Elixir under the GS1 specification.
+A [GTIN](https://www.gtin.info/) (Global Trade Item Number) & UPC (Universal Price Code) Generation and Validation Library in Elixir under the GS1 specification.
 
 - GTIN-8 (EAN/UCC-8): this is an 8-digit number used predominately outside of North America
 - GTIN-12 (UPC-A): this is a 12-digit number used primarily in North America
@@ -27,20 +27,20 @@ Features to Come:
 
 ## Installation
 
-*WARNING `1.0.1` contains breaking changes from `1.0.0`* (I know this is a patch release but the breaking changes related to the deprecation of `check_gtin` and `generate_gtin` were noted in the changelog and docs over a year ago)
-*WARNING `1.0.0` contains breaking changes from `0.4.0`*
+_WARNING `1.0.1` contains breaking changes from `1.0.0`_ (I know this is a patch release but the breaking changes related to the deprecation of `check_gtin` and `generate_gtin` were noted in the changelog and docs over a year ago)
+_WARNING `1.0.0` contains breaking changes from `0.4.0`_
 
 Add `:ex_gtin` as a dependency to your project's `mix.exs`:
 
 ```elixir
 def deps do
-  [{:ex_gtin, "~> 1.1.0"}]
+  [{:ex_gtin, "~> 1.2.0"}]
 end
 ```
 
 and run `mix deps.get` to install the `:ex_gtin` dependency
 
-```bash
+```shell
 mix deps.get
 ```
 
@@ -62,7 +62,7 @@ iex> ExGtin.validate!("6291041500213")
 Pass GTIN numbers in as a String, Number or an Array
 
 ```elixir
-iex> number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1,3]
+iex> number = [6, 2, 9, 1, 0, 4, 1, 5, 0, 0, 2, 1, 3]
 iex> ExGtin.validate(number)
 {:ok, "GTIN-13"}
 
@@ -92,7 +92,7 @@ iex> ExGtin.Validation.find_gs1_prefix_country("53523235")
 
 ```elixir
 iex> ExGtin.normalize("6291041500213")
-{:ok, "06291041500213"}
+{:ok, "16291041500210"}
 ```
 
 ### Using Strings, Arrays or Numbers
@@ -131,14 +131,20 @@ Documentation can be found at [https://hexdocs.pm/ex_gtin](https://hexdocs.pm/ex
 
 Run tests with
 
-```elixir
+```shell
 mix test
 ```
 
 Run test coverage
 
-```elixir
+```shell
 MIX_ENV=test mix coveralls
+```
+
+Produce Coverage report in HTML to `cover/excoveralls.html`
+
+```shell
+MIX_ENV=test mix coveralls.html
 ```
 
 ## Contributing
@@ -149,19 +155,19 @@ When making pull requests, please be sure to update the [CHANGELOG.md](CHANGELOG
 
 Run static code analysis
 
-```bash
+```shell
 mix credo
 ```
 
 Generate Documentation
 
-```bash
+```shell
 mix docs
 ```
 
 Run the gambit of tests, static analysis and coverage
 
-```bash
+```shell
 mix pull_request_checkout.task
 ```
 
@@ -187,6 +193,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Publish & Releasing
 
-```elixir
+```shell
 mix hex.publish
 ```

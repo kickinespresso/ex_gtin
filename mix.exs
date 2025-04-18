@@ -7,13 +7,13 @@ defmodule ExGtin.Mixfile do
   def project do
     [
       app: :ex_gtin,
-      version: "1.1.0",
+      version: "1.2.0",
       elixir: "~> 1.12",
       description: description(),
       aliases: aliases(),
       package: package(),
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
       test_coverage: [tool: ExCoveralls],
       coverallspreferred_cli_env: [
@@ -32,7 +32,7 @@ defmodule ExGtin.Mixfile do
         main: "ExGtin",
         extras: ["README.md"]
       ]
-   ]
+    ]
   end
 
   # Configuration for the OTP application
@@ -45,9 +45,9 @@ defmodule ExGtin.Mixfile do
 
   defp deps do
     [
-      {:credo, "~> 1.6.1", only: [:dev, :test]},
-      {:ex_doc, "~> 0.27.0", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.14.4", only: :test}
+      {:credo, "~> 1.7.11", only: [:dev, :test]},
+      {:ex_doc, "~> 0.37.3", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.18.5", only: :test}
     ]
   end
 
@@ -61,20 +61,22 @@ defmodule ExGtin.Mixfile do
   end
 
   defp aliases do
-    [c: "compile",
+    [
+      c: "compile",
       "pull_request_checkout.task": [
         "test",
         "credo --strict",
-        "coveralls"
-      ],
+        "coveralls",
+        "format --check-formatted"
+      ]
     ]
   end
 
   defp description do
-     """
-       Elixir Global Trade Item Number (GTIN) Validation Library for GS1, UPC-12, and GLN.
-       Validates GTIN-8, GTIN-12 (UPC-12), GTIN-13 (GLN), GTIN-14 codes.
-       Universal Price Code (UPC)
-     """
+    """
+      Elixir Global Trade Item Number (GTIN) Validation Library for GS1, UPC-12, and GLN.
+      Validates GTIN-8, GTIN-12 (UPC-12), GTIN-13 (GLN), GTIN-14 codes.
+      Universal Price Code (UPC)
+    """
   end
 end

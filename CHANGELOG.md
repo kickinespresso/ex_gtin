@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-04-14
+
+- Fixed incorrect GS1 Code handling as noted in issue `#2`
+- Fixed normalize function to add correct GTIN-14 indicator digit prefix as a default of `1`
+  - Updarted Cooresponding DocTests
+- Added tests and corrected bad tests that were validating bad checks
+- Added tests for edge cases and checks for error handling
+- Fixed incorrect `@spec` for `validate!`
+- Update README.md with better formatting and refreshed notes
+- Added `.formatter.exs`
+-
+
 ## [1.1.0] - 2022-01-11
 
 - Adding test coverage
@@ -21,7 +33,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [1.0.2] - 2021-03-14
 
 Summary: Merged new function `normalize/1` and other refactoring thanks to the fork [fork](https://github.com/hellonarrativ/ex_gtin)
- and @michaeljguarino
+and @michaeljguarino
 
 Details:
 
@@ -38,19 +50,19 @@ Details:
 - Update dependenciens `credo`, `excoveralls` and `ex_doc` to the latest versions - @cdesch
 - Add installation instructions to readme.md - @cdesch
 - Testing with elixir 1.11.3 - @cdesch
-- Remove deperated functions `check_gtin` and `generate_gtin` - *Please use `validate/1` and `generate/1` instead* - @cdesch
-- Remove tests associated with `check_gtin` and `generate_gtin` - *Please use `validate/1` and `generate/1` instead* - @cdesch
+- Remove deperated functions `check_gtin` and `generate_gtin` - _Please use `validate/1` and `generate/1` instead_ - @cdesch
+- Remove tests associated with `check_gtin` and `generate_gtin` - _Please use `validate/1` and `generate/1` instead_ - @cdesch
 - Convert `@since` to `@doc since:` for `ex_doc` - @cdesch
 - Add proper `@doc since: "1.0.0"` to `validation.ex` - @cdesch
 - Add `preferred_cli_env` as `:test` for `pull_request_checkout.task` task - @cdesch
 
 ## [1.0.0] - 2019-08-06
 
-### Contains breaking changes*
+### Contains breaking changes\*
 
-- *BREAKING CHANGE* `generate/1` - Formerly would return the result. It now returns the result in an atom e.g. `{:ok, "6291041500213"}`  - @cdesch
-- Added `generate!/1` - Raises `ArgumentError` if invalid  - @cdesch
-- Added `validate!/1`- Raises `ArgumentError` if invalid  - @cdesch
+- _BREAKING CHANGE_ `generate/1` - Formerly would return the result. It now returns the result in an atom e.g. `{:ok, "6291041500213"}` - @cdesch
+- Added `generate!/1` - Raises `ArgumentError` if invalid - @cdesch
+- Added `validate!/1`- Raises `ArgumentError` if invalid - @cdesch
 - Deprecated `generate_gtin` for `generate`. `generate_gtin` will be removed in version `1.0.1` - @cdesch
 - Deprecated `check_gtin` for `validate`. `check_gtin` will be removed in version `1.0.1` - @cdesch
 - Updated README with changes
