@@ -35,9 +35,6 @@ defmodule ExGtin do
 
       iex> ExGtin.normalize("6291041500213")
       {:ok, "16291041500210"}
-
-      iex> ExGtin.validate("6291041500214")
-      {:error, "Invalid Code"}
   """
   @doc since: "1.1.0"
   @spec normalize(binary | list(number)) :: result
@@ -128,12 +125,12 @@ defmodule ExGtin do
       iex> ExGtin.generate!("629104150021")
       "6291041500213"
 
-      iex> ExGtin.generate("62921")
-      {:error, "Invalid GTIN Code Length"}
+      iex> ExGtin.generate!("62921")
+      ** (ArgumentError) Invalid GTIN Code Length
 
   """
-  @doc since: "1.0.0"
-  @spec generate!(String.t() | list(number)) :: number | {atom, String.t()}
+  @doc since: "1.2.0"
+  @spec generate!(String.t() | list(number)) :: binary()
   def generate!(number) do
     case generate_gtin_code(number) do
       {:ok, result} -> result
