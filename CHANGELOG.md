@@ -51,7 +51,7 @@ Details:
 - Update dependenciens `credo`, `excoveralls` and `ex_doc` to the latest versions - @cdesch
 - Add installation instructions to readme.md - @cdesch
 - Testing with elixir 1.11.3 - @cdesch
-- Remove deperated functions `check_gtin` and `generate_gtin` - _Please use `validate/1` and `generate/1` instead_ - @cdesch
+- Remove deprecated functions `check_gtin` and `generate_gtin` - _Please use `validate/1` and `generate/1` instead_ - @cdesch
 - Remove tests associated with `check_gtin` and `generate_gtin` - _Please use `validate/1` and `generate/1` instead_ - @cdesch
 - Convert `@since` to `@doc since:` for `ex_doc` - @cdesch
 - Add proper `@doc since: "1.0.0"` to `validation.ex` - @cdesch
