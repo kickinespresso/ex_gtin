@@ -295,9 +295,6 @@ defmodule ExGtin.Validation do
       x when x in 100..139 ->
         {:ok, "GS1 US"}
 
-      x when x == 535 ->
-        {:ok, "GS1 Malta"}
-
       x when x in 020..029 ->
         {:ok,
          "Used to issue restricted circulation numbers within a geographic region (MO defined)"}
