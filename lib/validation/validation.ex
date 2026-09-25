@@ -27,9 +27,13 @@ defmodule ExGtin.Validation do
     |> gtin_check_digit()
   end
 
-  @spec gtin_check_digit(number) :: {atom, String.t()}
-  def gtin_check_digit(number) when is_number(number),
+  @spec gtin_check_digit(integer) :: {atom, String.t()}
+  def gtin_check_digit(number) when is_integer(number),
     do: gtin_check_digit(Integer.digits(number))
+
+  @spec gtin_check_digit(float) :: {atom, String.t()}
+  def gtin_check_digit(number) when is_float(number),
+    do: {:error, "Invalid numeric input"}
 
   @spec gtin_check_digit(list(number)) :: {atom, String.t()}
   def gtin_check_digit(number) do
@@ -49,6 +53,60 @@ defmodule ExGtin.Validation do
 
       {:error, error} ->
         {:error, error}
+    end
+  end
+
+  @doc """
+  Validates an ISBN-10 string using the mod-11 check digit.
+  The final character may be `X` (value 10).
+
+  Returns `boolean`
+
+  ## Examples
+
+      iex> ExGtin.Validation.valid_isbn10?("155860832X")
+      true
+
+      iex> ExGtin.Validation.valid_isbn10?("1234567890")
+      false
+  """
+  @doc since: "1.3.0"
+  @spec valid_isbn10?(String.t()) :: boolean
+  def valid_isbn10?(isbn) when is_bitstring(isbn) and byte_size(isbn) == 10 do
+    chars = String.codepoints(isbn)
+    {body, [check]} = Enum.split(chars, 9)
+
+    with {:ok, body_digits} <- isbn10_digits(body),
+         {:ok, check_value} <- isbn10_check_value(check) do
+      sum =
+        body_digits
+        |> Enum.with_index()
+        |> Enum.reduce(0, fn {d, i}, acc -> acc + (10 - i) * d end)
+
+      rem(sum + check_value, 11) == 0
+    else
+      _ -> false
+    end
+  end
+
+  def valid_isbn10?(_), do: false
+
+  defp isbn10_digits(chars) do
+    Enum.reduce_while(chars, {:ok, []}, fn c, {:ok, acc} ->
+      case Integer.parse(c) do
+        {n, ""} -> {:cont, {:ok, acc ++ [n]}}
+        _ -> {:halt, :error}
+      end
+    end)
+  end
+
+  defp isbn10_check_value("X"), do: {:ok, 10}
+  defp isbn10_check_value("x"), do: {:ok, 10}
+
+  defp isbn10_check_value(c) do
+    case Integer.parse(c) do
+      {n, ""} -> {:ok, n}
+      _ -> :error
     end
   end
 
@@ -75,9 +133,13 @@ defmodule ExGtin.Validation do
     |> generate_gtin_code()
   end
 
-  @spec generate_gtin_code(number) :: String.t() | {atom, String.t()}
-  def generate_gtin_code(number) when is_number(number),
+  @spec generate_gtin_code(integer) :: String.t() | {atom, String.t()}
+  def generate_gtin_code(number) when is_integer(number),
     do: generate_gtin_code(Integer.digits(number))
+
+  @spec generate_gtin_code(float) :: {atom, String.t()}
+  def generate_gtin_code(number) when is_float(number),
+    do: {:error, "Invalid numeric input"}
 
   @spec generate_gtin_code(list(number)) :: String.t() | {atom, String.t()}
   def generate_gtin_code(number) do
@@ -219,6 +281,12 @@ defmodule ExGtin.Validation do
   @doc """
   Find the GS1 prefix country for a GTIN number
 
+  Performs a *prefix-table* lookup on the leading digits of the input against
+  the GTIN-13 country-prefix table. Note that for an 8-digit input this does
+  **not** implement true GS1-8 prefix semantics (the `960..969` "Global Office
+  GTIN-8" range); it simply looks the leading three digits up in the same
+  GTIN-13 table. Real GTIN-8 (GS1-8) prefix support is a future enhancement.
+
   Returns `{atom, String.t()}`
 
   ## Examples
@@ -241,9 +309,13 @@ defmodule ExGtin.Validation do
     |> find_gs1_prefix_country()
   end
 
-  @spec find_gs1_prefix_country(number) :: {atom, String.t()}
-  def find_gs1_prefix_country(number) when is_number(number),
+  @spec find_gs1_prefix_country(integer) :: {atom, String.t()}
+  def find_gs1_prefix_country(number) when is_integer(number),
     do: find_gs1_prefix_country(Integer.digits(number))
+
+  @spec find_gs1_prefix_country(float) :: {atom, String.t()}
+  def find_gs1_prefix_country(number) when is_float(number),
+    do: {:error, "Invalid numeric input"}
 
   @spec find_gs1_prefix_country(list(number)) :: {atom, String.t()}
   def find_gs1_prefix_country(number) do

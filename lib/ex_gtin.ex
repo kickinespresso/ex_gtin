@@ -23,7 +23,7 @@ defmodule ExGtin do
       {:error, "Invalid Code"}
   """
   @doc since: "0.4.0"
-  @spec validate(String.t() | list(number)) :: result
+  @spec validate(String.t() | integer | list(number)) :: result
   def validate(number) do
     gtin_check_digit(number)
   end
@@ -37,14 +37,28 @@ defmodule ExGtin do
       {:ok, "16291041500210"}
   """
   @doc since: "1.1.0"
-  @spec normalize(binary | list(number)) :: result
+  @spec normalize(binary | integer | list(number)) :: result
+  def normalize(gtin) when is_list(gtin), do: normalize(Enum.join(gtin))
+
   def normalize(gtin) do
     with {:ok, type} <- do_gtin_check_digit(gtin),
          do: {:ok, normalize_gtin(gtin, type)}
   end
 
-  defp do_gtin_check_digit(isbn) when byte_size(isbn) == 10, do: {:ok, "ISBN-10"}
+  defp do_gtin_check_digit(isbn) when is_bitstring(isbn) and byte_size(isbn) == 10 do
+    cond do
+      valid_isbn10?(isbn) -> {:ok, "ISBN-10"}
+      # 10 well-formed ISBN-10 characters but a bad check digit -> not a valid code
+      isbn10_shaped?(isbn) -> {:error, "Invalid Code"}
+      # anything else (letters, separators, etc.) falls through and is handled
+      # as a normal code, which raises on non-numeric input as before
+      true -> gtin_check_digit(isbn)
+    end
+  end
+
   defp do_gtin_check_digit(gtin), do: gtin_check_digit(gtin)
+
+  defp isbn10_shaped?(isbn), do: Regex.match?(~r/^[0-9]{9}[0-9Xx]$/, isbn)
 
   defp normalize_gtin(gtin, "GTIN-8") do
     digits = String.codepoints(gtin) |> Enum.map(&String.to_integer/1)
@@ -53,8 +67,11 @@ defmodule ExGtin do
   end
 
   defp normalize_gtin(gtin, "ISBN-10") do
-    digits = String.codepoints(gtin) |> Enum.map(&String.to_integer/1)
-    {code, _} = Enum.split(digits, 9)
+    code =
+      gtin
+      |> String.codepoints()
+      |> Enum.take(9)
+      |> Enum.map(&String.to_integer/1)
 
     "0978#{Enum.join(code)}#{generate_check_digit([9, 7, 8] ++ code)}"
   end
@@ -84,7 +101,7 @@ defmodule ExGtin do
       "GTIN-13"
   """
   @doc since: "1.2.0"
-  @spec validate!(String.t() | list(number)) :: String.t()
+  @spec validate!(String.t() | integer | list(number)) :: String.t()
   def validate!(number) do
     case gtin_check_digit(number) do
       {:ok, result} -> result
@@ -107,7 +124,7 @@ defmodule ExGtin do
 
   """
   @doc since: "0.4.0"
-  @spec generate(String.t() | list(number)) :: number | {atom, String.t()}
+  @spec generate(String.t() | integer | list(number)) :: result
   def generate(number) do
     case generate_gtin_code(number) do
       {:ok, result} -> {:ok, result}
@@ -130,7 +147,7 @@ defmodule ExGtin do
 
   """
   @doc since: "1.2.0"
-  @spec generate!(String.t() | list(number)) :: binary()
+  @spec generate!(String.t() | integer | list(number)) :: binary()
   def generate!(number) do
     case generate_gtin_code(number) do
       {:ok, result} -> result
@@ -155,7 +172,7 @@ defmodule ExGtin do
       {:error, "No GS1 prefix found"}
   """
   @doc since: "0.1.0"
-  @spec gs1_prefix_country(String.t() | list(number)) :: {atom, String.t()}
+  @spec gs1_prefix_country(String.t() | integer | list(number)) :: {atom, String.t()}
   def gs1_prefix_country(number) do
     find_gs1_prefix_country(number)
   end

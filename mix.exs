@@ -7,7 +7,7 @@ defmodule ExGtin.Mixfile do
   def project do
     [
       app: :ex_gtin,
-      version: "1.2.1",
+      version: "1.3.0",
       elixir: "~> 1.15",
       description: description(),
       aliases: aliases(),
@@ -16,12 +16,10 @@ defmodule ExGtin.Mixfile do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       test_coverage: [tool: ExCoveralls],
-      coverallspreferred_cli_env: [
+      preferred_cli_env: [
         "coveralls.detail": :test,
         "coveralls.post": :test,
-        "coveralls.html": :test
-      ],
-      preferred_cli_env: [
+        "coveralls.html": :test,
         "pull_request_checkout.task": :test
       ],
       # Docs

@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-09-25
+
+- Fixed `normalize/1` crashing on a valid ISBN-10 whose check digit is `X`
+- `normalize/1` now validates the ISBN-10 check digit before treating a 10-character
+  input as an ISBN-10; a 10-digit string with a bad checksum now returns
+  `{:error, "Invalid Code"}` instead of silently normalizing garbage
+- Fixed `normalize/1` crashing on list input, which its `@spec` already advertised
+- Numeric guards narrowed to `is_integer/1`; float input now returns
+  `{:error, "Invalid numeric input"}` instead of raising `FunctionClauseError`
+- Corrected typespecs to include `integer` input and fixed `generate/1`'s return spec
+- Added `ExGtin.Validation.valid_isbn10?/1`
+- Documented that `find_gs1_prefix_country/1` does a generic prefix-table lookup and
+  does not implement true GS1-8 prefix semantics for GTIN-8 barcodes
+- Tooling: replaced deprecated `import Mix.Config` with `import Config` and folded the
+  mistyped `coverallspreferred_cli_env` key into `preferred_cli_env`
+
 ## [1.2.1] - 2025-12-08
 
 Remove duplicate reference to Malta
