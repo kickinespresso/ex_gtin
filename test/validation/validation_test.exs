@@ -242,7 +242,7 @@ defmodule ExGtin.ValidationTest do
     assert lookup_gs1_prefix(528) == {:ok, "GS1 Lebanon"}
     assert lookup_gs1_prefix(529) == {:ok, "GS1 Cyprus"}
     assert lookup_gs1_prefix(530) == {:ok, "GS1 Albania"}
-    assert lookup_gs1_prefix(531) == {:ok, "GS1 Macedonia"}
+    assert lookup_gs1_prefix(531) == {:ok, "GS1 North Macedonia"}
     assert lookup_gs1_prefix(535) == {:ok, "GS1 Malta"}
     assert lookup_gs1_prefix(539) == {:ok, "GS1 Ireland"}
     assert lookup_gs1_prefix(540) == {:ok, "GS1 Belgium & Luxembourg"}

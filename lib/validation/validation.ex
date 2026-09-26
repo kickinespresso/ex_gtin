@@ -167,11 +167,7 @@ defmodule ExGtin.Validation do
   """
   @doc since: "1.0.0"
   @spec generate_check_digit(list(number)) :: number
-  def generate_check_digit(number) do
-    number
-    |> multiply_and_sum_array()
-    |> subtract_from_nearest_multiple_of_ten()
-  end
+  def generate_check_digit(number), do: ExGtin.CheckDigit.mod10(number)
 
   @doc """
   Calculates the sum of the digits in a string and multiplied value based on index order
@@ -347,400 +343,178 @@ defmodule ExGtin.Validation do
   Returns {atom, String.t()}
 
   """
+  # GS1 prefix table — verified against the official GS1 Company Prefix
+  # allocation list as of 2026-09-26.
+  # Source: https://www.gs1.org/standards/id-keys/company-prefix
+  # Cross-referenced with the maintained public summary at
+  # https://en.wikipedia.org/wiki/List_of_GS1_country_codes (source: GS1
+  # Company Prefix). Note: GS1 prefixes identify the issuing Member
+  # Organisation, not a product's country of origin. Lookups are performed on
+  # the leading 3 digits, so allocations finer than 3 digits (e.g. the
+  # 960–969 GTIN-8 sub-ranges) are represented at 3-digit granularity.
+  #
+  # Ordered list of {range, name} tuples. Lookup traverses top-to-bottom and
+  # returns the first entry whose range contains the number, replicating the
+  # top-to-bottom clause semantics of the previous case statement. Refreshing
+  # the table is now a data edit here rather than a code change.
+  @gs1_prefixes [
+    {001..019, "GS1 US"},
+    {030..039, "GS1 US"},
+    {050..059, "GS1 US"},
+    {060..099, "GS1 US"},
+    {100..139, "GS1 US"},
+    {020..029,
+     "Used to issue restricted circulation numbers within a geographic region (MO defined)"},
+    {040..049, "Used to issue GS1 restricted circulation numbers within a company"},
+    {200..299,
+     "Used to issue GS1 restricted circulation number within a geographic region (MO defined)"},
+    {300..379, "GS1 France"},
+    {380..380, "GS1 Bulgaria"},
+    {381..381, "GS1 Kosovo"},
+    {383..383, "GS1 Slovenija"},
+    {385..385, "GS1 Croatia"},
+    {387..387, "GS1 BIH (Bosnia-Herzegovina)"},
+    {389..389, "GS1 Montenegro"},
+    {400..440, "GS1 Germany"},
+    {450..459, "GS1 Japan"},
+    {490..499, "GS1 Japan"},
+    {460..469, "GS1 Russia"},
+    {470..470, "GS1 Kyrgyzstan"},
+    {471..471, "GS1 Taiwan"},
+    {474..474, "GS1 Estonia"},
+    {475..475, "GS1 Latvia"},
+    {476..476, "GS1 Azerbaijan"},
+    {477..477, "GS1 Lithuania"},
+    {478..478, "GS1 Uzbekistan"},
+    {479..479, "GS1 Sri Lanka"},
+    {480..480, "GS1 Philippines"},
+    {481..481, "GS1 Belarus"},
+    {482..482, "GS1 Ukraine"},
+    {483..483, "GS1 Turkmenistan"},
+    {484..484, "GS1 Moldova"},
+    {485..485, "GS1 Armenia"},
+    {486..486, "GS1 Georgia"},
+    {487..487, "GS1 Kazakstan"},
+    {488..488, "GS1 Tajikistan"},
+    {489..489, "GS1 Hong Kong"},
+    {500..509, "GS1 UK"},
+    {520..521, "GS1 Association Greece"},
+    {528..528, "GS1 Lebanon"},
+    {529..529, "GS1 Cyprus"},
+    {530..530, "GS1 Albania"},
+    {531..531, "GS1 North Macedonia"},
+    {535..535, "GS1 Malta"},
+    {539..539, "GS1 Ireland"},
+    {540..549, "GS1 Belgium & Luxembourg"},
+    {560..560, "GS1 Portugal"},
+    {569..569, "GS1 Iceland"},
+    {570..579, "GS1 Denmark"},
+    {590..590, "GS1 Poland"},
+    {594..594, "GS1 Romania"},
+    {599..599, "GS1 Hungary"},
+    {600..601, "GS1 South Africa"},
+    {603..603, "GS1 Ghana"},
+    {604..604, "GS1 Senegal"},
+    {605..605, "GS1 Uganda"},
+    {606..606, "GS1 Angola"},
+    {607..607, "GS1 Oman"},
+    {608..608, "GS1 Bahrain"},
+    {609..609, "GS1 Mauritius"},
+    {611..611, "GS1 Morocco"},
+    {612..612, "GS1 Somalia"},
+    {613..613, "GS1 Algeria"},
+    {615..615, "GS1 Nigeria"},
+    {616..616, "GS1 Kenya"},
+    {617..617, "GS1 Cameroon"},
+    {618..618, "GS1 Ivory Coast"},
+    {619..619, "GS1 Tunisia"},
+    {620..620, "GS1 Tanzania"},
+    {621..621, "GS1 Syria"},
+    {622..622, "GS1 Egypt"},
+    # NOTE: Per GS1, prefix 623 was reassigned from Brunei to "Managed by GS1
+    # Global Office for future MO" in May 2021. The historical "GS1 Brunei"
+    # value is retained to preserve existing behavior; revisit if a definitive
+    # replacement label is required.
+    {623..623, "GS1 Brunei"},
+    {624..624, "GS1 Libya"},
+    {625..625, "GS1 Jordan"},
+    {626..626, "GS1 Iran"},
+    {627..627, "GS1 Kuwait"},
+    {628..628, "GS1 Saudi Arabia"},
+    {629..629, "GS1 Emirates"},
+    {630..630, "GS1 Qatar"},
+    {631..631, "GS1 Namibia"},
+    {632..632, "GS1 Rwanda"},
+    {640..649, "GS1 Finland"},
+    {680..681, "GS1 China"},
+    {690..699, "GS1 China"},
+    {700..709, "GS1 Norway"},
+    {729..729, "GS1 Israel"},
+    {730..739, "GS1 Sweden"},
+    {740..740, "GS1 Guatemala"},
+    {741..741, "GS1 El Salvador"},
+    {742..742, "GS1 Honduras"},
+    {743..743, "GS1 Nicaragua"},
+    {744..744, "GS1 Costa Rica"},
+    {745..745, "GS1 Panama"},
+    {746..746, "GS1 Republica Dominicana"},
+    {750..750, "GS1 Mexico"},
+    {754..755, "GS1 Canada"},
+    {759..759, "GS1 Venezuela"},
+    {760..769, "GS1 Schweiz, Suisse, Svizzera"},
+    {770..771, "GS1 Colombia"},
+    {773..773, "GS1 Uruguay"},
+    {775..775, "GS1 Peru"},
+    {777..777, "GS1 Bolivia"},
+    {778..779, "GS1 Argentina"},
+    {780..780, "GS1 Chile"},
+    {784..784, "GS1 Paraguay"},
+    {786..786, "GS1 Ecuador"},
+    {789..790, "GS1 Brasil"},
+    {800..839, "GS1 Italy"},
+    {840..849, "GS1 Spain"},
+    {850..850, "GS1 Cuba"},
+    {858..858, "GS1 Slovakia"},
+    {859..859, "GS1 Czech"},
+    {860..860, "GS1 Serbia"},
+    {865..865, "GS1 Mongolia"},
+    {867..867, "GS1 North Korea"},
+    {868..869, "GS1 Turkey"},
+    {870..879, "GS1 Netherlands"},
+    {880..881, "GS1 South Korea"},
+    {883..883, "GS1 Myanmar"},
+    {884..884, "GS1 Cambodia"},
+    {885..885, "GS1 Thailand"},
+    {887..887, "GS1 Laos"},
+    {888..888, "GS1 Singapore"},
+    {890..890, "GS1 India"},
+    {893..893, "GS1 Vietnam"},
+    {894..894, "GS1 Bangladesh"},
+    {896..896, "GS1 Pakistan"},
+    {899..899, "GS1 Indonesia"},
+    {900..919, "GS1 Austria"},
+    {930..939, "GS1 Australia"},
+    {940..949, "GS1 New Zealand"},
+    {950..950, "GS1 Global Office"},
+    {951..951,
+     "Used to issue General Manager Numbers for the EPC General Identifier (GID) scheme as defined by the EPC Tag Data Standard*"},
+    {952..952, "Used for demonstrations and examples of the GS1 system"},
+    {955..955, "GS1 Malaysia"},
+    {958..958, "GS1 Macau"},
+    {960..969, "Global Office (GTIN-8s)*"},
+    {977..977, "Serial publications (ISSN)"},
+    {978..979, "Bookland (ISBN)"},
+    {980..980, "Refund receipts"},
+    {981..984, "GS1 coupon identification for common currency areas"},
+    {990..999, "GS1 coupon identification"}
+  ]
+
   @doc since: "1.0.0"
   @spec lookup_gs1_prefix(integer) :: {atom, String.t()}
-  # credo:disable-for-next-line
   def lookup_gs1_prefix(number) do
-    case number do
-      x when x in 001..019 ->
-        {:ok, "GS1 US"}
-
-      x when x in 030..039 ->
-        {:ok, "GS1 US"}
-
-      x when x in 050..059 ->
-        {:ok, "GS1 US"}
-
-      x when x in 060..099 ->
-        {:ok, "GS1 US"}
-
-      x when x in 100..139 ->
-        {:ok, "GS1 US"}
-
-      x when x in 020..029 ->
-        {:ok,
-         "Used to issue restricted circulation numbers within a geographic region (MO defined)"}
-
-      x when x in 040..049 ->
-        {:ok, "Used to issue GS1 restricted circulation numbers within a company"}
-
-      x when x in 200..299 ->
-        {:ok,
-         "Used to issue GS1 restricted circulation number within a geographic region (MO defined)"}
-
-      x when x in 300..379 ->
-        {:ok, "GS1 France"}
-
-      x when x == 380 ->
-        {:ok, "GS1 Bulgaria"}
-
-      x when x == 383 ->
-        {:ok, "GS1 Slovenija"}
-
-      x when x == 385 ->
-        {:ok, "GS1 Croatia"}
-
-      x when x == 387 ->
-        {:ok, "GS1 BIH (Bosnia-Herzegovina)"}
-
-      x when x == 389 ->
-        {:ok, "GS1 Montenegro"}
-
-      x when x in 400..440 ->
-        {:ok, "GS1 Germany"}
-
-      x when x in 450..459 ->
-        {:ok, "GS1 Japan"}
-
-      x when x in 490..499 ->
-        {:ok, "GS1 Japan"}
-
-      x when x in 460..469 ->
-        {:ok, "GS1 Russia"}
-
-      x when x == 470 ->
-        {:ok, "GS1 Kyrgyzstan"}
-
-      x when x == 471 ->
-        {:ok, "GS1 Taiwan"}
-
-      x when x == 474 ->
-        {:ok, "GS1 Estonia"}
-
-      x when x == 475 ->
-        {:ok, "GS1 Latvia"}
-
-      x when x == 476 ->
-        {:ok, "GS1 Azerbaijan"}
-
-      x when x == 477 ->
-        {:ok, "GS1 Lithuania"}
-
-      x when x == 478 ->
-        {:ok, "GS1 Uzbekistan"}
-
-      x when x == 479 ->
-        {:ok, "GS1 Sri Lanka"}
-
-      x when x == 480 ->
-        {:ok, "GS1 Philippines"}
-
-      x when x == 481 ->
-        {:ok, "GS1 Belarus"}
-
-      x when x == 482 ->
-        {:ok, "GS1 Ukraine"}
-
-      x when x == 483 ->
-        {:ok, "GS1 Turkmenistan"}
-
-      x when x == 484 ->
-        {:ok, "GS1 Moldova"}
-
-      x when x == 485 ->
-        {:ok, "GS1 Armenia"}
-
-      x when x == 486 ->
-        {:ok, "GS1 Georgia"}
-
-      x when x == 487 ->
-        {:ok, "GS1 Kazakstan"}
-
-      x when x == 488 ->
-        {:ok, "GS1 Tajikistan"}
-
-      x when x == 489 ->
-        {:ok, "GS1 Hong Kong"}
-
-      x when x in 500..509 ->
-        {:ok, "GS1 UK"}
-
-      x when x in 520..521 ->
-        {:ok, "GS1 Association Greece"}
-
-      x when x == 528 ->
-        {:ok, "GS1 Lebanon"}
-
-      x when x == 529 ->
-        {:ok, "GS1 Cyprus"}
-
-      x when x == 530 ->
-        {:ok, "GS1 Albania"}
-
-      x when x == 531 ->
-        {:ok, "GS1 Macedonia"}
-
-      x when x == 535 ->
-        {:ok, "GS1 Malta"}
-
-      x when x == 539 ->
-        {:ok, "GS1 Ireland"}
-
-      x when x in 540..549 ->
-        {:ok, "GS1 Belgium & Luxembourg"}
-
-      x when x == 560 ->
-        {:ok, "GS1 Portugal"}
-
-      x when x == 569 ->
-        {:ok, "GS1 Iceland"}
-
-      x when x in 570..579 ->
-        {:ok, "GS1 Denmark"}
-
-      x when x == 590 ->
-        {:ok, "GS1 Poland"}
-
-      x when x == 594 ->
-        {:ok, "GS1 Romania"}
-
-      x when x == 599 ->
-        {:ok, "GS1 Hungary"}
-
-      x when x in 600..601 ->
-        {:ok, "GS1 South Africa"}
-
-      x when x == 603 ->
-        {:ok, "GS1 Ghana"}
-
-      x when x == 604 ->
-        {:ok, "GS1 Senegal"}
-
-      x when x == 608 ->
-        {:ok, "GS1 Bahrain"}
-
-      x when x == 609 ->
-        {:ok, "GS1 Mauritius"}
-
-      x when x == 611 ->
-        {:ok, "GS1 Morocco"}
-
-      x when x == 613 ->
-        {:ok, "GS1 Algeria"}
-
-      x when x == 615 ->
-        {:ok, "GS1 Nigeria"}
-
-      x when x == 616 ->
-        {:ok, "GS1 Kenya"}
-
-      x when x == 618 ->
-        {:ok, "GS1 Ivory Coast"}
-
-      x when x == 619 ->
-        {:ok, "GS1 Tunisia"}
-
-      x when x == 620 ->
-        {:ok, "GS1 Tanzania"}
-
-      x when x == 621 ->
-        {:ok, "GS1 Syria"}
-
-      x when x == 622 ->
-        {:ok, "GS1 Egypt"}
-
-      x when x == 623 ->
-        {:ok, "GS1 Brunei"}
-
-      x when x == 624 ->
-        {:ok, "GS1 Libya"}
-
-      x when x == 625 ->
-        {:ok, "GS1 Jordan"}
-
-      x when x == 626 ->
-        {:ok, "GS1 Iran"}
-
-      x when x == 627 ->
-        {:ok, "GS1 Kuwait"}
-
-      x when x == 628 ->
-        {:ok, "GS1 Saudi Arabia"}
-
-      x when x == 629 ->
-        {:ok, "GS1 Emirates"}
-
-      x when x in 640..649 ->
-        {:ok, "GS1 Finland"}
-
-      x when x in 690..699 ->
-        {:ok, "GS1 China"}
-
-      x when x in 700..709 ->
-        {:ok, "GS1 Norway"}
-
-      x when x == 729 ->
-        {:ok, "GS1 Israel"}
-
-      x when x in 730..739 ->
-        {:ok, "GS1 Sweden"}
-
-      x when x == 740 ->
-        {:ok, "GS1 Guatemala"}
-
-      x when x == 741 ->
-        {:ok, "GS1 El Salvador"}
-
-      x when x == 742 ->
-        {:ok, "GS1 Honduras"}
-
-      x when x == 743 ->
-        {:ok, "GS1 Nicaragua"}
-
-      x when x == 744 ->
-        {:ok, "GS1 Costa Rica"}
-
-      x when x == 745 ->
-        {:ok, "GS1 Panama"}
-
-      x when x == 746 ->
-        {:ok, "GS1 Republica Dominicana"}
-
-      x when x == 750 ->
-        {:ok, "GS1 Mexico"}
-
-      x when x in 754..755 ->
-        {:ok, "GS1 Canada"}
-
-      x when x == 759 ->
-        {:ok, "GS1 Venezuela"}
-
-      x when x in 760..769 ->
-        {:ok, "GS1 Schweiz, Suisse, Svizzera"}
-
-      x when x in 770..771 ->
-        {:ok, "GS1 Colombia"}
-
-      x when x == 773 ->
-        {:ok, "GS1 Uruguay"}
-
-      x when x == 775 ->
-        {:ok, "GS1 Peru"}
-
-      x when x == 777 ->
-        {:ok, "GS1 Bolivia"}
-
-      x when x in 778..779 ->
-        {:ok, "GS1 Argentina"}
-
-      x when x == 780 ->
-        {:ok, "GS1 Chile"}
-
-      x when x == 784 ->
-        {:ok, "GS1 Paraguay"}
-
-      x when x == 786 ->
-        {:ok, "GS1 Ecuador"}
-
-      x when x in 789..790 ->
-        {:ok, "GS1 Brasil"}
-
-      x when x in 800..839 ->
-        {:ok, "GS1 Italy"}
-
-      x when x in 840..849 ->
-        {:ok, "GS1 Spain"}
-
-      x when x == 850 ->
-        {:ok, "GS1 Cuba"}
-
-      x when x == 858 ->
-        {:ok, "GS1 Slovakia"}
-
-      x when x == 859 ->
-        {:ok, "GS1 Czech"}
-
-      x when x == 860 ->
-        {:ok, "GS1 Serbia"}
-
-      x when x == 865 ->
-        {:ok, "GS1 Mongolia"}
-
-      x when x == 867 ->
-        {:ok, "GS1 North Korea"}
-
-      x when x in 868..869 ->
-        {:ok, "GS1 Turkey"}
-
-      x when x in 870..879 ->
-        {:ok, "GS1 Netherlands"}
-
-      x when x == 880 ->
-        {:ok, "GS1 South Korea"}
-
-      x when x == 884 ->
-        {:ok, "GS1 Cambodia"}
-
-      x when x == 885 ->
-        {:ok, "GS1 Thailand"}
-
-      x when x == 888 ->
-        {:ok, "GS1 Singapore"}
-
-      x when x == 890 ->
-        {:ok, "GS1 India"}
-
-      x when x == 893 ->
-        {:ok, "GS1 Vietnam"}
-
-      x when x == 896 ->
-        {:ok, "GS1 Pakistan"}
-
-      x when x == 899 ->
-        {:ok, "GS1 Indonesia"}
-
-      x when x in 900..919 ->
-        {:ok, "GS1 Austria"}
-
-      x when x in 930..939 ->
-        {:ok, "GS1 Australia"}
-
-      x when x in 940..949 ->
-        {:ok, "GS1 New Zealand"}
-
-      x when x == 950 ->
-        {:ok, "GS1 Global Office"}
-
-      x when x == 951 ->
-        {:ok,
-         "Used to issue General Manager Numbers for the EPC General Identifier (GID) scheme as defined by the EPC Tag Data Standard*"}
-
-      x when x == 955 ->
-        {:ok, "GS1 Malaysia"}
-
-      x when x == 958 ->
-        {:ok, "GS1 Macau"}
-
-      x when x in 960..969 ->
-        {:ok, "Global Office (GTIN-8s)*"}
-
-      x when x == 977 ->
-        {:ok, "Serial publications (ISSN)"}
-
-      x when x in 978..979 ->
-        {:ok, "Bookland (ISBN)"}
-
-      x when x == 980 ->
-        {:ok, "Refund receipts"}
-
-      x when x in 981..984 ->
-        {:ok, "GS1 coupon identification for common currency areas"}
-
-      x when x in 990..999 ->
-        {:ok, "GS1 coupon identification"}
-
-      _ ->
-        {:error, "No GS1 prefix found"}
+    case Enum.find(@gs1_prefixes, fn {range, _name} -> number in range end) do
+      {_range, name} -> {:ok, name}
+      nil -> {:error, "No GS1 prefix found"}
     end
   end
 end

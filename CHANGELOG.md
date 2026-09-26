@@ -5,6 +5,154 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [1.4.0] - 2026-09-26
+
+- Added batch validation helpers `ExGtin.validate_all/1` and
+  `ExGtin.partition/1` (F9), backed by `ExGtin.Batch`
+  - `validate_all(codes)` maps each input to a `{code, ExGtin.validate(code)}`
+    tuple, preserving input order
+  - `partition(codes)` returns `%{valid: [...], invalid: [...]}`, preserving
+    order within each bucket
+  - Individual items never raise: a bad code (wrong length, non-digit, or a
+    tampered check digit) is captured as an `{:error, _}` result rather than
+    aborting the batch. `ExGtin.validate/1` raises on a correct-length,
+    non-digit input, so `ExGtin.Batch` catches that and reports
+    `{:error, "Invalid Code"}` to preserve the batch contract
+  - An empty list returns `[]` (`validate_all/1`) or empty buckets
+    (`partition/1`)
+- Added a generic fixed-length GS1 key path in `ExGtin.Keys`: a `@key_lengths`
+  table drives `ExGtin.Keys.validate_key/2` and `ExGtin.Keys.generate_key/2`,
+  covering `:gln`, `:sscc`, `:gsin`, `:gsrn`, `:gcn`, and `:gdti` (base form)
+  with the shared length + mod-10 logic
+  - `validate_key(code, key)` returns `{:ok, key}` for a code of the correct
+    length with a valid mod-10 check digit, `{:error, "Invalid Code"}` for a
+    right-length code with a wrong check digit, and an `{:error, _}` tuple for
+    wrong-length or non-digit input
+  - `generate_key(body, key)` takes a body one digit shorter than the key,
+    appends the mod-10 check digit, and returns `{:ok, code}`
+  - The key type is explicit, so same-length keys never collide (e.g. `:sscc`
+    and `:gsrn` are both 18 — the caller states which)
+  - Added format validation for the variable-component keys, which are **not**
+    pure length + mod-10 checks: `:grai` (GRAI, a 14-digit `0`-led numeric core
+    with a mod-10 check plus an optional serial of up to 16 GS1
+    Character-Set-82 characters), `:giai` (GIAI, a numeric-prefixed alphanumeric
+    reference of up to 30 Character-Set-82 characters, no check digit), and
+    `:gdti` (GDTI, a 13-digit numeric core plus an optional serial of up to 17
+    numeric digits). A malformed structure returns `{:error, "Invalid GRAI"}` /
+    `"Invalid GIAI"` / `"Invalid GDTI"`, and a bad numeric-core check digit
+    returns `{:error, "Invalid Code"}`
+  - `generate_key/2` supports only the fixed-length keys; the
+    variable-component keys `:grai` and `:giai` return
+    `{:error, "Unsupported key"}` (a free-form serial has no single canonical
+    value to generate), and `generate_key(_, :gdti)` produces only the base
+    13-digit form
+  - The explicit key type prevents same-length collisions: an 18-digit value
+    validates as `:sscc` or `:gsrn` per the caller, and a 13-digit value as
+    `:gln`, `:gcn`, or `:gdti` — the caller states which
+  - Exposed publicly as `ExGtin.validate_key/2` and `ExGtin.generate_key/2`,
+    thin delegates to `ExGtin.Keys`
+  - `validate_sscc/1`, `generate_sscc/1`, `validate_gsin/1`, and
+    `generate_gsin/1` now delegate to this table-driven path and keep their
+    existing `"SSCC"` / `"GSIN"` string labels and behavior
+- Completed Bookland support: ISBN-10 ⇄ ISBN-13 conversion and ISBN
+  validation via `ExGtin.isbn10_to_isbn13/1`, `ExGtin.isbn13_to_isbn10/1`, and
+  `ExGtin.valid_isbn?/1`, backed by `ExGtin.Convert.Bookland`
+  - `isbn10_to_isbn13/1` validates the ISBN-10 (mod-11, trailing `X` allowed)
+    and returns `{:ok, isbn13}` equal to `978` followed by the first 9 ISBN-10
+    digits and a recomputed GS1 mod-10 check digit, so the result validates as
+    `GTIN-13` via `ExGtin.validate/1`; an invalid ISBN-10 returns
+    `{:error, "Invalid ISBN-10"}`
+  - `isbn13_to_isbn10/1` reverses a `978`-prefixed ISBN-13 to
+    `{:ok, isbn10}` with a recomputed ISBN-10 mod-11 check digit, which may be
+    `X`; a `979`-prefixed ISBN-13 has no ISBN-10 equivalent and returns
+    `{:error, "ISBN-13 with 979 prefix has no ISBN-10 equivalent"}`, and any
+    other invalid input returns `{:error, "Invalid ISBN-13"}`
+  - `valid_isbn?/1` dispatches on length: a 10-character input is checked with
+    the ISBN-10 mod-11 rule (reusing `ExGtin.Validation.valid_isbn10?/1`) and a
+    13-digit input as an ISBN-13 (`978`/`979` prefix with a valid mod-10 check)
+  - The `X` check digit is handled in both conversion directions, and an
+    ISBN-10 with a bad mod-11 check or an ISBN-13 with a bad mod-10 check is
+    rejected
+  - Accepts String, integer, and digit-list inputs (note the leading-zero
+    caveat for integer input)
+- Added GSIN (Global Shipment Identification Number) validation and generation:
+  `ExGtin.validate_gsin/1` and `ExGtin.generate_gsin/1` (plus raising `!`
+  variants), backed by `ExGtin.Keys`
+  - `validate_gsin/1` returns `{:ok, "GSIN"}` for a 17-digit code with a valid
+    mod-10 check digit and `{:error, "Invalid Code"}` for a 17-digit code with
+    a wrong check digit
+  - `generate_gsin/1` takes a 16-digit body and returns `{:ok, gsin}` with the
+    check digit appended
+  - Any wrong-length or non-digit input returns an `{:error, _}` tuple
+  - Key detection is explicit: a 17-digit GSIN is never classified as an SSCC,
+    a GTIN, or any other key of a nearby length, and an 18-digit SSCC is never
+    classified as a GSIN
+  - Round-trip guarantee: `validate_gsin(generate_gsin(body)) == {:ok, "GSIN"}`
+  - Accepts String, integer, and digit-list inputs (note the leading-zero
+    caveat for integer input)
+- Added SSCC (Serial Shipping Container Code) validation and generation:
+  `ExGtin.validate_sscc/1` and `ExGtin.generate_sscc/1` (plus raising `!`
+  variants), backed by `ExGtin.Keys`
+  - `validate_sscc/1` returns `{:ok, "SSCC"}` for an 18-digit code with a valid
+    mod-10 check digit and `{:error, "Invalid Code"}` for an 18-digit code with
+    a wrong check digit
+  - `generate_sscc/1` takes a 17-digit body and returns `{:ok, sscc}` with the
+    check digit appended
+  - Any wrong-length or non-digit input returns an `{:error, _}` tuple
+  - Key detection is explicit: an 18-digit SSCC is never classified as a GTIN,
+    and a 14-digit GTIN is never classified as an SSCC
+  - Round-trip guarantee: `validate_sscc(generate_sscc(body)) == {:ok, "SSCC"}`
+  - Accepts String, integer, and digit-list inputs (note the leading-zero
+    caveat for integer input)
+- Added structured component extraction: `ExGtin.parse/1`, backed by
+  `ExGtin.Parse`
+  - Returns `{:ok, parsed}` for a valid GTIN-8/12/13/14, where `parsed` exposes
+    `type`, `digits`, `indicator`, `gs1_prefix`, `gs1_prefix_region`,
+    `check_digit`, and `valid?`
+  - `indicator` is the leading packaging digit for a GTIN-14 and `nil` for every
+    other type
+  - A tampered check digit yields `valid?: false` rather than an error; an
+    `{:error, _}` tuple is returned only for genuinely invalid input (wrong
+    length or non-digit characters)
+  - An unknown GS1 prefix maps `gs1_prefix_region` to `nil`
+  - No company/item split is performed, since the company-prefix length is not
+    derivable from the number offline
+  - Accepts String, integer, and digit-list inputs
+- Added GTIN-14 down-conversion: `ExGtin.to_gtin13/1` and `ExGtin.to_gtin12/1`
+  (plus raising `!` variants), backed by `ExGtin.Convert.GTIN14`
+  - A GTIN-14 with indicator `0` reduces to its base GTIN-13 by stripping the
+    leading zero; the mod-10 check digit is unchanged, so the result validates
+    as `GTIN-13` via `ExGtin.validate/1`
+  - `to_gtin12/1` additionally strips the next leading zero and re-validates the
+    result as `GTIN-12`
+  - A GTIN-14 whose indicator is in `1..9` returns
+    `{:error, "GTIN-14 indicator is not 0; no base GTIN-13"}`; a GTIN-14 with
+    indicator `0` but a non-zero next digit returns
+    `{:error, "GTIN-14 has no base GTIN-12"}`
+  - Round-trip guarantee: `to_gtin13(normalize(x, 0)) == {:ok, x}`
+  - Accepts String, integer, and digit-list inputs
+- Added a configurable GTIN-14 indicator digit via `ExGtin.normalize/2`
+  - The optional `indicator` (`0..9`, default `1`) becomes the leading digit of
+    the emitted GTIN-14, with the check digit recomputed over the full body so
+    the result validates as `GTIN-14` via `ExGtin.validate/1`
+  - `normalize/1` (no indicator) is unchanged and still uses the per-type default
+    leading digit (`1` for GTIN-8/12/13, `0` for ISBN-10)
+  - An indicator outside `0..9` returns
+    `{:error, "Invalid indicator digit; must be in 0..9"}`
+- Added UPC-E ⇄ UPC-A conversion: `ExGtin.upce_to_upca/1` and `ExGtin.upca_to_upce/1`
+  (plus raising `!` variants), backed by `ExGtin.Convert.UPC`
+  - Expansion is a table-driven zero-suppression transform keyed on the 6th UPC-E
+    body digit; only number systems `0` and `1` are eligible
+  - The UPC-A check digit is always recomputed, so expanded output validates as
+    `GTIN-12` via `ExGtin.validate/1`
+  - `upca_to_upce/1` returns `{:error, "UPC-A is not compressible to UPC-E"}` when
+    no zero-run pattern matches
+  - Accepts String, integer, and digit-list inputs
+- Added a shared mod-10 check-digit engine `ExGtin.CheckDigit`
+  (`mod10/1`, `valid?/1`, `append/1`); `ExGtin.Validation` now delegates to it
+
 ## [1.3.0] - 2026-09-25
 
 - Fixed `normalize/1` crashing on a valid ISBN-10 whose check digit is `X`

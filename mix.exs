@@ -7,7 +7,7 @@ defmodule ExGtin.Mixfile do
   def project do
     [
       app: :ex_gtin,
-      version: "1.3.0",
+      version: "1.4.0",
       elixir: "~> 1.15",
       description: description(),
       aliases: aliases(),
@@ -16,12 +16,6 @@ defmodule ExGtin.Mixfile do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [
-        "coveralls.detail": :test,
-        "coveralls.post": :test,
-        "coveralls.html": :test,
-        "pull_request_checkout.task": :test
-      ],
       # Docs
       name: "ExGtin",
       source_url: "https://github.com/kickinespresso/ex_gtin",
@@ -29,6 +23,20 @@ defmodule ExGtin.Mixfile do
       docs: [
         main: "ExGtin",
         extras: ["README.md"]
+      ]
+    ]
+  end
+
+  # CLI configuration (preferred environments per task)
+  #
+  # Type "mix help cli" for more information
+  def cli do
+    [
+      preferred_envs: [
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test,
+        "pull_request_checkout.task": :test
       ]
     ]
   end
@@ -45,7 +53,8 @@ defmodule ExGtin.Mixfile do
     [
       {:credo, "~> 1.7.11", only: [:dev, :test]},
       {:ex_doc, "~> 0.37.3", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.18.5", only: :test}
+      {:excoveralls, "~> 0.18.5", only: :test},
+      {:stream_data, "~> 1.1", only: [:dev, :test]}
     ]
   end
 
