@@ -151,22 +151,26 @@ defmodule ExGtin.Convert.Bookland do
   def isbn13_to_isbn10(isbn13) do
     with {:ok, digits} <- to_digits(isbn13),
          true <- valid_isbn13?(digits) do
-      case digits do
-        [9, 7, 8 | _] ->
-          body = digits |> Enum.slice(3, @isbn10_body_length)
-
-          case isbn10_check_digit(body) do
-            {:error, error} -> {:error, error}
-            check -> {:ok, Enum.join(body) <> to_string(check)}
-          end
-
-        _ ->
-          {:error, "ISBN-13 with 979 prefix has no ISBN-10 equivalent"}
-      end
+      reduce_valid_isbn13(digits)
     else
       _ -> {:error, "Invalid ISBN-13"}
     end
   end
+
+  # Reduces an already-validated ISBN-13 to its ISBN-10 form. Only a
+  # 978-prefixed code has an ISBN-10 equivalent; a 979 prefix does not.
+  @spec reduce_valid_isbn13(list(0..9)) :: {:ok, String.t()} | {:error, String.t()}
+  defp reduce_valid_isbn13([9, 7, 8 | _] = digits) do
+    body = Enum.slice(digits, 3, @isbn10_body_length)
+
+    case isbn10_check_digit(body) do
+      {:error, error} -> {:error, error}
+      check -> {:ok, Enum.join(body) <> to_string(check)}
+    end
+  end
+
+  defp reduce_valid_isbn13(_digits),
+    do: {:error, "ISBN-13 with 979 prefix has no ISBN-10 equivalent"}
 
   @doc """
   Validates an ISBN by dispatching on its length.
