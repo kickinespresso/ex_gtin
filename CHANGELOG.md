@@ -7,6 +7,67 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-09-26
+
+- Added GS1-128 / Application Identifier (AI) element-string parsing (F10):
+  `ExGtin.parse_gs1/1`, `ExGtin.parse_gs1/2`, and the raising
+  `ExGtin.parse_gs1!/1`, backed by `ExGtin.GS1.ElementString` and the
+  data-driven `ExGtin.GS1.AITable` dictionary
+  - A single entry point accepts **both** serializations of the same logical
+    payload: the parenthesized human-readable form (`(01)06291041500213(10)ABC123`,
+    recognized because it starts with `(`) and the raw FNC1 scanner form (fixed-length
+    AIs concatenated without a separator, variable-length AIs terminated by the
+    FNC1/GS separator, ASCII 29). Both forms of the same payload produce an equal
+    `%{ai => value}` map
+  - Initially supported AI set: `01` (GTIN), `10` (Batch/Lot), `11` (Production
+    Date), `13` (Packaging Date), `15` (Best Before Date), `17` (Expiration
+    Date), `21` (Serial Number), and the 3xx variable-measure weight AIs —
+    `3100`–`3105` (net weight, kg), `3200`–`3205` (net weight, lb), `3300`–`3305`
+    (gross weight, kg), `3400`–`3405` (gross weight, lb), and `3560`–`3565`
+    (net weight, troy ounce)
+  - The embedded GTIN (AI `01`) is check-digit validated via `ExGtin.CheckDigit`;
+    an invalid embedded GTIN is reported as an error
+  - Date-format AIs (`11`/`13`/`15`/`17`) are surfaced as their raw `YYMMDD`
+    string by default; opt in to Elixir `Date` structs with `parse_gs1/2` and
+    `dates: :parsed`
+  - An AI outside the supported set produces an
+    `{:error, {:unknown_ai, code, position}}` when it appears at the very start
+    (nothing parsed yet); other structured errors cover a wrong fixed-length
+    value, unbalanced parentheses, and an invalid embedded GTIN
+  - Partial parses are non-lossy: when a leading portion parses but the remainder
+    cannot be interpreted after at least one AI+value pair, the unparsed
+    remainder is reported as a 3-tuple `{:ok, map, unparsed}` rather than dropped
+  - `parse_gs1!/1` returns the parsed map on a full parse, returns a
+    `{map, unparsed}` tuple on a partial parse (a partial parse does **not**
+    raise), and raises `ArgumentError` only on a hard `{:error, _}`
+- Added variable-measure / price-embedded restricted-circulation-number (RCN)
+  parsing (F11), backed by `ExGtin.RCN` and the data-driven
+  `ExGtin.RCN.Schemes`
+  - RCN recognition via `ExGtin.RCN.recognize/1` and `ExGtin.RCN.rcn_prefix?/1`,
+    matching the `02` (`020`–`029`) and `20`–`29` (`200`–`299`) prefixes flagged
+    by the existing GS1 prefix table; non-RCN input returns an `{:error, _}`
+    tuple
+  - Scheme-driven decoding via `ExGtin.RCN.decode/2` against either a shipped
+    scheme's named atom or an explicit scheme map, returning
+    `{:ok, %{item: item, embedded: %{price: _} | %{weight: _}}}` with the item
+    reference and embedded amount as raw digit substrings (leading zeros
+    preserved, no implied-decimal scaling applied)
+  - Internal price/weight check-digit validation when a scheme declares one
+    (`check: {:price_check, position}`): the digit at that position is checked
+    against a GS1 mod-10 check digit computed over the embedded field via the
+    shared `ExGtin.CheckDigit.mod10/1` engine, an **illustrative convention** for
+    the shipped schemes; a mismatch returns
+    `{:error, "Invalid internal price check digit"}`, and a scheme with
+    `check: nil` skips the check
+  - A code whose leading prefix is not listed in the scheme returns
+    `{:error, "Code prefix does not match scheme"}`; an unknown scheme atom and a
+    non-13-digit or non-digit code each return an `{:error, _}` tuple
+  - RCN layouts are region/retailer defined, so a scheme is always supplied
+    explicitly; two illustrative schemes ship on the `"2"` prefix —
+    `:gs1_germany_price` (item positions 2..6, embedded price 8..12, with an
+    internal price check digit at position 7) and `:gs1_embedded_weight` (item
+    positions 2..7, embedded weight 8..12, no internal check digit)
+
 ## [1.4.0] - 2026-09-26
 
 - Added batch validation helpers `ExGtin.validate_all/1` and

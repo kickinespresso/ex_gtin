@@ -329,4 +329,134 @@ defmodule ExGtinTest do
       assert {:ok, "16291041500210"} == normalize("6291041500213")
     end
   end
+
+  # Requirement 5 — public element-string parsing API (F10). The parse_gs1
+  # doctests in lib/ex_gtin.ex are already exercised by the `doctest ExGtin`
+  # declaration above; these unit tests cover the behaviours that back
+  # requirements 5.1–5.4 through the public entry points.
+  @valid_embedded_gtin "06291041500213"
+  @gs <<29>>
+
+  describe "parse_gs1/1 mixed payloads (5.1)" do
+    test "parenthesized payload with multiple AIs parses to the expected map" do
+      assert {:ok, %{"01" => @valid_embedded_gtin, "17" => "261231", "10" => "ABC123"}} ==
+               parse_gs1("(01)06291041500213(17)261231(10)ABC123")
+    end
+
+    test "raw FNC1 payload with multiple AIs parses to the expected map" do
+      payload = "010629104150021310ABC123" <> @gs <> "21XYZ789"
+
+      assert {:ok, %{"01" => @valid_embedded_gtin, "10" => "ABC123", "21" => "XYZ789"}} ==
+               parse_gs1(payload)
+    end
+
+    test "a payload mixing a GTIN and a 3xx weight AI parses" do
+      assert {:ok, %{"01" => @valid_embedded_gtin, "3103" => "000123"}} ==
+               parse_gs1("(01)06291041500213(3103)000123")
+    end
+  end
+
+  describe "parse_gs1/1 accepts both forms through one entry point (5.2)" do
+    test "parenthesized and raw forms of the same payload produce equal maps" do
+      parenthesized = parse_gs1("(01)06291041500213(10)ABC123")
+      raw = parse_gs1("010629104150021310ABC123")
+
+      assert {:ok, %{"01" => @valid_embedded_gtin, "10" => "ABC123"}} == parenthesized
+      assert parenthesized == raw
+    end
+  end
+
+  describe "parse_gs1/1 surfaces the unparsed remainder (5.3)" do
+    test "a trailing unknown AI is reported as the unparsed remainder" do
+      assert {:ok, %{"01" => @valid_embedded_gtin}, "(99)ABC"} ==
+               parse_gs1("(01)06291041500213(99)ABC")
+    end
+  end
+
+  describe "parse_gs1/1 errors on an unsupported AI at the start (5.4)" do
+    test "an unknown AI at position 0 errors with the code and position" do
+      assert {:error, {:unknown_ai, "99", 0}} == parse_gs1("(99)ABC")
+    end
+  end
+
+  describe "parse_gs1/2 date interpretation option" do
+    test "dates: :parsed interprets a date AI into a Date struct" do
+      assert {:ok, %{"01" => @valid_embedded_gtin, "17" => ~D[2026-12-31]}} ==
+               parse_gs1("(01)06291041500213(17)261231", dates: :parsed)
+    end
+
+    test "the default leaves date AIs as the raw YYMMDD string" do
+      assert {:ok, %{"01" => @valid_embedded_gtin, "17" => "261231"}} ==
+               parse_gs1("(01)06291041500213(17)261231")
+    end
+  end
+
+  describe "parse_gs1!/1" do
+    test "returns the parsed map on a full parse" do
+      assert %{"01" => @valid_embedded_gtin, "10" => "ABC123"} ==
+               parse_gs1!("(01)06291041500213(10)ABC123")
+    end
+
+    test "returns a {map, unparsed} tuple on a partial parse without raising" do
+      assert {%{"01" => @valid_embedded_gtin}, "(99)ABC"} ==
+               parse_gs1!("(01)06291041500213(99)ABC")
+    end
+
+    test "raises ArgumentError on a hard error" do
+      assert_raise ArgumentError, fn -> parse_gs1!("(99)ABC") end
+    end
+  end
+
+  # Requirement 8 — public RCN parsing API (F11). The parse_rcn/2 and
+  # parse_rcn!/2 doctests in lib/ex_gtin.ex are already exercised by the
+  # `doctest ExGtin` declaration above; these unit tests cover the behaviours
+  # that back requirements 8.1–8.3 through the public entry points, including a
+  # fixture per shipped scheme.
+  @germany_price_fixture "2123451789012"
+  @embedded_weight_fixture "2456789012349"
+
+  describe "parse_rcn/2 fixtures per shipped scheme (8.2)" do
+    test ":gs1_germany_price decodes the price fixture" do
+      assert {:ok, %{item: "12345", embedded: %{price: "78901"}}} ==
+               parse_rcn(@germany_price_fixture, :gs1_germany_price)
+    end
+
+    test ":gs1_embedded_weight decodes the weight fixture" do
+      assert {:ok, %{item: "456789", embedded: %{weight: "01234"}}} ==
+               parse_rcn(@embedded_weight_fixture, :gs1_embedded_weight)
+    end
+  end
+
+  describe "parse_rcn/2 accepts a scheme map (8.1)" do
+    test "an explicit scheme map decodes the same as its named equivalent" do
+      scheme = %{prefix: ["2"], item: 2..6, embedded: {:price, 8..12}, check: nil}
+
+      assert {:ok, %{item: "12345", embedded: %{price: "78901"}}} ==
+               parse_rcn(@germany_price_fixture, scheme)
+    end
+  end
+
+  describe "parse_rcn/2 errors on unknown prefix or scheme (8.3)" do
+    test "a non-RCN / wrong-prefix code errors against a shipped scheme" do
+      assert {:error, _reason} = parse_rcn("6291041500213", :gs1_germany_price)
+    end
+
+    test "an unknown scheme atom errors" do
+      assert {:error, "Unknown RCN scheme: :no_such_scheme"} ==
+               parse_rcn(@germany_price_fixture, :no_such_scheme)
+    end
+  end
+
+  describe "parse_rcn!/2" do
+    test "returns the decoded map on success" do
+      assert %{item: "12345", embedded: %{price: "78901"}} ==
+               parse_rcn!(@germany_price_fixture, :gs1_germany_price)
+    end
+
+    test "raises ArgumentError on error" do
+      assert_raise ArgumentError, fn ->
+        parse_rcn!(@germany_price_fixture, :no_such_scheme)
+      end
+    end
+  end
 end

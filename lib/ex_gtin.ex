@@ -10,6 +10,8 @@ defmodule ExGtin do
   alias ExGtin.Convert.Bookland
   alias ExGtin.Convert.GTIN14
   alias ExGtin.Convert.UPC
+  alias ExGtin.GS1.ElementString
+  alias ExGtin.RCN
 
   @type result :: {:ok, binary} | {:error, binary}
 
@@ -708,5 +710,196 @@ defmodule ExGtin do
   @spec gs1_prefix_country(String.t() | integer | list(number)) :: {atom, String.t()}
   def gs1_prefix_country(number) do
     find_gs1_prefix_country(number)
+  end
+
+  @doc """
+  Parses a GS1-128 / Application Identifier (AI) element string.
+
+  A single entry point that accepts **both** serializations of the same logical
+  payload and dispatches to the matching parser:
+
+    * the **parenthesized** human-readable form, `(01)06291041500213(10)ABC123`,
+      recognized because the payload starts with `(`; and
+    * the **raw FNC1** scanner form, where fixed-length AIs are concatenated
+      without a separator and variable-length AIs are terminated by the FNC1/GS
+      separator (`<GS>`, ASCII 29) or the end of the payload.
+
+  Any payload that does not start with `(` is treated as the raw FNC1 form.
+  Delegates to `ExGtin.GS1.ElementString`; both forms of the same payload produce
+  an equal `%{ai => value}` map. Returns `{:ok, map}` on success or
+  `{:error, reason}` on failure (unknown AI, wrong fixed-length value, unbalanced
+  parentheses, or an invalid embedded GTIN — see
+  `t:ExGtin.GS1.ElementString.error/0`).
+
+  The initially supported AI set is 01, 10, 11, 13, 15, 17, 21, and the 3xx
+  weight AIs; an AI outside that set produces an `{:error, {:unknown_ai, _, _}}`
+  tuple. Date-format AIs (11/13/15/17) are surfaced as their raw `YYMMDD` string;
+  see `parse_gs1/2` to opt into interpreting them into Elixir `Date` structs.
+
+  ## Partial parses
+
+  When a leading portion of the payload parses but the remainder cannot be
+  interpreted (an unknown AI, or leftover bytes that do not form a known AI code)
+  after at least one AI+value pair has been read, the unparsed remainder is
+  reported as a 3-tuple `{:ok, map, unparsed}` rather than dropped. A payload
+  that is uninterpretable from the very start is still an `{:error, _}`; see the
+  "Partial parses and the unparsed remainder" section of
+  `ExGtin.GS1.ElementString` for the full rules.
+
+  ## Examples
+
+  The parenthesized form (starts with `(`):
+
+      iex> ExGtin.parse_gs1("(01)06291041500213(17)261231(10)ABC123")
+      {:ok, %{"01" => "06291041500213", "17" => "261231", "10" => "ABC123"}}
+
+  The raw FNC1 form of the same payload parses through the same entry point:
+
+      iex> ExGtin.parse_gs1("010629104150021310ABC123" <> <<29>> <> "21XYZ789")
+      {:ok, %{"01" => "06291041500213", "10" => "ABC123", "21" => "XYZ789"}}
+
+  A payload whose leading AIs parse but whose tail is an unknown AI reports the
+  unparsed remainder instead of dropping it:
+
+      iex> ExGtin.parse_gs1("(01)06291041500213(99)ABC")
+      {:ok, %{"01" => "06291041500213"}, "(99)ABC"}
+
+  An unsupported AI at the very start (nothing parsed yet) errors with the
+  offending code and its position:
+
+      iex> ExGtin.parse_gs1("(99)ABC")
+      {:error, {:unknown_ai, "99", 0}}
+  """
+  @doc since: "1.5.0"
+  @spec parse_gs1(String.t()) :: ExGtin.GS1.ElementString.result()
+  def parse_gs1(payload), do: parse_gs1(payload, [])
+
+  @doc """
+  Parses a GS1-128 / AI element string with parser options.
+
+  Behaves exactly like `parse_gs1/1`, dispatching on the leading `(` to the
+  parenthesized or raw FNC1 parser, but forwards `opts` to
+  `ExGtin.GS1.ElementString`. The primary documented option is `:dates`:
+
+    * `dates: :raw` (the default) keeps date-format AI values (11/13/15/17) as the
+      raw `YYMMDD` string; and
+    * `dates: :parsed` interprets them into Elixir `Date` structs.
+
+  ## Examples
+
+      iex> ExGtin.parse_gs1("(01)06291041500213(17)261231", dates: :parsed)
+      {:ok, %{"01" => "06291041500213", "17" => ~D[2026-12-31]}}
+  """
+  @doc since: "1.5.0"
+  @spec parse_gs1(String.t(), ExGtin.GS1.ElementString.options()) ::
+          ExGtin.GS1.ElementString.result()
+  def parse_gs1("(" <> _rest = payload, opts),
+    do: ElementString.parse_parenthesized(payload, opts)
+
+  def parse_gs1(payload, opts), do: ElementString.parse_raw(payload, opts)
+
+  @doc """
+  Parses a GS1-128 / AI element string, raising on error.
+
+  The raising counterpart of `parse_gs1/1`: returns the parsed `%{ai => value}`
+  map directly on a full parse, or raises `ArgumentError` on any parse error.
+  Because element-string errors are structured tuples (see
+  `t:ExGtin.GS1.ElementString.error/0`) rather than strings, the reason is
+  formatted into the exception message with `inspect/1`.
+
+  A **partial parse does not raise**: parsing itself succeeded for the leading
+  portion, so `parse_gs1!/1` returns a `{map, unparsed}` tuple carrying the
+  parsed map and the uninterpretable trailing remainder, rather than raising and
+  discarding the remainder. Only a hard `{:error, _}` (including a payload that
+  is uninterpretable from the very start) raises.
+
+  ## Examples
+
+      iex> ExGtin.parse_gs1!("(01)06291041500213(10)ABC123")
+      %{"01" => "06291041500213", "10" => "ABC123"}
+
+  A partial parse returns the parsed map paired with the unparsed remainder
+  instead of raising:
+
+      iex> ExGtin.parse_gs1!("(01)06291041500213(99)ABC")
+      {%{"01" => "06291041500213"}, "(99)ABC"}
+
+      iex> ExGtin.parse_gs1!("(99)ABC")
+      ** (ArgumentError) {:unknown_ai, "99", 0}
+  """
+  @doc since: "1.5.0"
+  @spec parse_gs1!(String.t()) ::
+          ExGtin.GS1.ElementString.parsed()
+          | {ExGtin.GS1.ElementString.parsed(), unparsed :: String.t()}
+  def parse_gs1!(payload) do
+    case parse_gs1(payload) do
+      {:ok, result} -> result
+      {:ok, result, unparsed} -> {result, unparsed}
+      {:error, reason} -> raise ArgumentError, message: inspect(reason)
+    end
+  end
+
+  @doc """
+  Decodes a restricted-circulation number's embedded price/weight against a scheme.
+
+  A single public entry point for RCN decoding that delegates to
+  `ExGtin.RCN.decode/2`. `code` is a GTIN-13 digit string, non-negative integer,
+  or digit list, and `scheme` is either a shipped scheme's named atom (resolved
+  via `ExGtin.RCN.Schemes.fetch/1`) or an explicit
+  `t:ExGtin.RCN.Schemes.rcn_scheme/0` scheme map, so callers can use a documented
+  default or supply their own market layout.
+
+  On success returns `{:ok, t:ExGtin.RCN.rcn_parsed/0}` — a map with the extracted
+  `item` reference and an `embedded` map carrying the raw digit substring under
+  `:price` or `:weight`, per the scheme's `embedded` tag. Both values are raw
+  digit strings (leading zeros preserved, no implied-decimal scaling applied);
+  callers apply any scaling their market needs. Returns `{:error, reason}` when
+  the code is the wrong length, is not a digit sequence, does not match the
+  scheme's prefix, names an unknown scheme, or fails the scheme's internal
+  price/weight check digit.
+
+  ## Examples
+
+  A named scheme with an internal price check digit:
+
+      iex> ExGtin.parse_rcn("2123451789012", :gs1_germany_price)
+      {:ok, %{item: "12345", embedded: %{price: "78901"}}}
+
+  An explicit scheme map:
+
+      iex> scheme = %{prefix: ["2"], item: 2..6, embedded: {:price, 8..12}, check: nil}
+      iex> ExGtin.parse_rcn("2123456789012", scheme)
+      {:ok, %{item: "12345", embedded: %{price: "78901"}}}
+
+  An unknown scheme errors:
+
+      iex> ExGtin.parse_rcn("2123456789012", :no_such_scheme)
+      {:error, "Unknown RCN scheme: :no_such_scheme"}
+  """
+  @doc since: "1.5.0"
+  @spec parse_rcn(RCN.code(), RCN.scheme()) ::
+          {:ok, RCN.rcn_parsed()} | {:error, String.t()}
+  def parse_rcn(code, scheme), do: RCN.decode(code, scheme)
+
+  @doc """
+  Decodes a restricted-circulation number against a scheme, raising on error.
+
+  The raising counterpart of `parse_rcn/2`: returns the
+  `t:ExGtin.RCN.rcn_parsed/0` map directly on success, or raises `ArgumentError`
+  with the failure reason as its message. RCN errors are plain strings, so the
+  reason is used as the exception message directly.
+
+  ## Examples
+
+      iex> ExGtin.parse_rcn!("2123451789012", :gs1_germany_price)
+      %{item: "12345", embedded: %{price: "78901"}}
+  """
+  @doc since: "1.5.0"
+  @spec parse_rcn!(RCN.code(), RCN.scheme()) :: RCN.rcn_parsed()
+  def parse_rcn!(code, scheme) do
+    case RCN.decode(code, scheme) do
+      {:ok, result} -> result
+      {:error, reason} -> raise ArgumentError, message: reason
+    end
   end
 end
