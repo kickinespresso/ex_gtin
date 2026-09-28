@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- CI (`.github/workflows/elixir.yml`) now runs a version matrix instead of a
+  single Elixir version: `1.15`/OTP `26` (the `~> 1.15` floor declared in
+  `mix.exs`), `1.18`/OTP `27`, and `1.20`/OTP `29`. The `1.20` leg exercises the
+  gradual set-theoretic type checker. `fail-fast: false` lets each leg report
+  independently. The declared Elixir requirement is unchanged (`~> 1.15`)
+- Both GitHub Actions workflows now trigger on the `main` branch instead of
+  `master`
+- Bumped `.tool-versions` to `elixir 1.20.4` / `erlang 29.0` for local dev
+  parity with the newest CI leg
+
+### Fixed
+
+- Pinned the `len` variable inside two `binary-size(...)` bitstring matches in
+  `ExGtin.GS1.ElementString` (`^len`), resolving warnings surfaced by the
+  Elixir 1.20 compiler that would fail a `--warnings-as-errors` build. No
+  behavior change
+
 ## [1.5.0] - 2026-09-26
 
 - Added GS1-128 / Application Identifier (AI) element-string parsing (F10):

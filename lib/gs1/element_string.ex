@@ -519,7 +519,7 @@ defmodule ExGtin.GS1.ElementString do
   @spec known_ai_at_length(String.t(), pos_integer) ::
           {String.t(), pos_integer, String.t()} | nil
   defp known_ai_at_length(payload, len) when byte_size(payload) >= len do
-    <<code::binary-size(len), rest::binary>> = payload
+    <<code::binary-size(^len), rest::binary>> = payload
 
     case AITable.lookup(code) do
       {:ok, _entry} -> {code, len, rest}
@@ -555,7 +555,7 @@ defmodule ExGtin.GS1.ElementString do
           {:ok, String.t(), non_neg_integer, String.t()} | {:error, error}
   defp extract_value({_name, {:fixed, len}, _format}, code, payload, position) do
     case payload do
-      <<value::binary-size(len), rest::binary>> ->
+      <<value::binary-size(^len), rest::binary>> ->
         {:ok, value, len, rest}
 
       _too_short ->

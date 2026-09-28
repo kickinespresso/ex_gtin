@@ -3,11 +3,28 @@ name: Elixir Tests
 on:
   pull_request:
     branches:
-      - master # Or your default branch
+      - main # Or your default branch
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Floor: prove the `~> 1.15` requirement in mix.exs still compiles.
+          - elixir-version: "1.15"
+            otp-version: "26"
+          # Modern intermediate release.
+          - elixir-version: "1.18"
+            otp-version: "27"
+          # Latest: exercises the gradual set-theoretic type checker.
+          # Elixir 1.20 requires Erlang/OTP 27+ and supports OTP 29.
+          - elixir-version: "1.20"
+            otp-version: "29"
+
+    name: Test (Elixir ${{ matrix.elixir-version }} / OTP ${{ matrix.otp-version }})
 
     steps:
       - name: Checkout code
@@ -16,8 +33,8 @@ jobs:
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: "1.15"
-          otp-version: "26"
+          elixir-version: ${{ matrix.elixir-version }}
+          otp-version: ${{ matrix.otp-version }}
 
       - name: Install dependencies
         run: mix deps.get
