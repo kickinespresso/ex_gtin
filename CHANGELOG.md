@@ -21,6 +21,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+- Non-numeric string input to the string-accepting entry points now returns a
+  clean `{:error, "Invalid Code"}` tuple instead of raising `ArgumentError`.
+  `ExGtin.validate/1`, `ExGtin.generate/1`, and `ExGtin.gs1_prefix_country/1`
+  (via `ExGtin.Validation.gtin_check_digit/1`, `generate_gtin_code/1`, and
+  `find_gs1_prefix_country/1`) previously crashed on letters, whitespace,
+  separators (`-`, `.`), or other punctuation because they called
+  `String.to_integer/1` directly; they now parse each character safely. Empty
+  and wrong-length input continue to return `"Invalid GTIN Code Length"`, and
+  floats continue to return `"Invalid numeric input"`. The raising bang
+  variants (`validate!/1`, `generate!/1`) are unchanged and still raise
+  `ArgumentError`
 - Pinned the `len` variable inside two `binary-size(...)` bitstring matches in
   `ExGtin.GS1.ElementString` (`^len`), resolving warnings surfaced by the
   Elixir 1.20 compiler that would fail a `--warnings-as-errors` build. No

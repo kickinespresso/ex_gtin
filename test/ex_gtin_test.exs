@@ -55,23 +55,13 @@ defmodule ExGtinTest do
     end
 
     test "with whitespace" do
-      assert_raise ArgumentError, fn ->
-        validate(" 6291041500213 ")
-      end
-
-      assert_raise ArgumentError, fn ->
-        validate("\t6291041500213\t")
-      end
+      assert {:error, "Invalid Code"} == validate(" 6291041500213 ")
+      assert {:error, "Invalid Code"} == validate("\t6291041500213\t")
     end
 
     test "with non-numeric characters" do
-      assert_raise ArgumentError, fn ->
-        validate("629104150021a")
-      end
-
-      assert_raise ArgumentError, fn ->
-        validate("629104150021!")
-      end
+      assert {:error, "Invalid Code"} == validate("629104150021a")
+      assert {:error, "Invalid Code"} == validate("629104150021!")
     end
 
     test "with empty string" do
@@ -83,15 +73,11 @@ defmodule ExGtinTest do
     end
 
     test "with negative numbers" do
-      assert_raise ArgumentError, fn ->
-        validate("-6291041500213")
-      end
+      assert {:error, "Invalid Code"} == validate("-6291041500213")
     end
 
     test "with decimal numbers" do
-      assert_raise ArgumentError, fn ->
-        validate("629104150021.3")
-      end
+      assert {:error, "Invalid Code"} == validate("629104150021.3")
     end
   end
 
@@ -159,15 +145,11 @@ defmodule ExGtinTest do
     end
 
     test "with whitespace" do
-      assert_raise ArgumentError, fn ->
-        generate(" 629104150021 ")
-      end
+      assert {:error, "Invalid Code"} == generate(" 629104150021 ")
     end
 
     test "with non-numeric characters" do
-      assert_raise ArgumentError, fn ->
-        generate("629104150021a")
-      end
+      assert {:error, "Invalid Code"} == generate("629104150021a")
     end
 
     test "with empty string" do
@@ -273,13 +255,8 @@ defmodule ExGtinTest do
     end
 
     test "handles different separator characters" do
-      assert_raise ArgumentError, fn ->
-        normalize("401-707-25")
-      end
-
-      assert_raise ArgumentError, fn ->
-        normalize("401 707 25")
-      end
+      assert {:error, "Invalid Code"} == normalize("401-707-25")
+      assert {:error, "Invalid Code"} == normalize("401 707 25")
     end
   end
 

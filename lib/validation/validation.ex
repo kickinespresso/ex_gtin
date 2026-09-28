@@ -21,10 +21,10 @@ defmodule ExGtin.Validation do
   @doc since: "1.0.0"
   @spec gtin_check_digit(String.t()) :: {atom, String.t()}
   def gtin_check_digit(number) when is_bitstring(number) do
-    number
-    |> String.codepoints()
-    |> Enum.map(&String.to_integer/1)
-    |> gtin_check_digit()
+    case string_to_digits(number) do
+      {:ok, digits} -> gtin_check_digit(digits)
+      {:error, error} -> {:error, error}
+    end
   end
 
   @spec gtin_check_digit(integer) :: {atom, String.t()}
@@ -53,6 +53,27 @@ defmodule ExGtin.Validation do
 
       {:error, error} ->
         {:error, error}
+    end
+  end
+
+  # Safely converts a numeric string into a list of digits, returning
+  # `{:error, "Invalid Code"}` when the string contains any non-digit
+  # character (including whitespace) instead of raising from
+  # `String.to_integer/1`. An empty string yields an empty digit list so the
+  # downstream length check reports the existing "Invalid GTIN Code Length".
+  @spec string_to_digits(String.t()) :: {:ok, list(0..9)} | {:error, String.t()}
+  defp string_to_digits(string) do
+    string
+    |> String.codepoints()
+    |> Enum.reduce_while({:ok, []}, fn char, {:ok, acc} ->
+      case Integer.parse(char) do
+        {digit, ""} when digit in 0..9 -> {:cont, {:ok, [digit | acc]}}
+        _ -> {:halt, {:error, "Invalid Code"}}
+      end
+    end)
+    |> case do
+      {:ok, digits} -> {:ok, Enum.reverse(digits)}
+      error -> error
     end
   end
 
@@ -127,10 +148,10 @@ defmodule ExGtin.Validation do
   @doc since: "1.0.0"
   @spec generate_gtin_code(String.t()) :: String.t() | {atom, String.t()}
   def generate_gtin_code(number) when is_bitstring(number) do
-    number
-    |> String.codepoints()
-    |> Enum.map(&String.to_integer/1)
-    |> generate_gtin_code()
+    case string_to_digits(number) do
+      {:ok, digits} -> generate_gtin_code(digits)
+      {:error, error} -> {:error, error}
+    end
   end
 
   @spec generate_gtin_code(integer) :: String.t() | {atom, String.t()}
@@ -299,10 +320,10 @@ defmodule ExGtin.Validation do
   @doc since: "1.0.0"
   @spec find_gs1_prefix_country(String.t()) :: {atom, String.t()}
   def find_gs1_prefix_country(number) when is_bitstring(number) do
-    number
-    |> String.codepoints()
-    |> Enum.map(&String.to_integer/1)
-    |> find_gs1_prefix_country()
+    case string_to_digits(number) do
+      {:ok, digits} -> find_gs1_prefix_country(digits)
+      {:error, error} -> {:error, error}
+    end
   end
 
   @spec find_gs1_prefix_country(integer) :: {atom, String.t()}

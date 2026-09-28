@@ -55,9 +55,10 @@ defmodule ExGtin.BugFixesTest do
       assert {:ok, "GS1 Malta"} == gs1_prefix_country("53523235")
     end
 
-    test "malformed 10-char strings still raise (separators, letters)" do
-      assert_raise ArgumentError, fn -> normalize("401-707-25") end
-      assert_raise ArgumentError, fn -> normalize("401 707 25") end
+    test "malformed 10-char strings return a clean error (separators, letters)" do
+      # Non-numeric input now returns {:error, _} instead of raising ArgumentError.
+      assert {:error, "Invalid Code"} == normalize("401-707-25")
+      assert {:error, "Invalid Code"} == normalize("401 707 25")
     end
   end
 end

@@ -461,23 +461,13 @@ defmodule ExGtin.ValidationTest do
 
   describe "edge cases for gtin_check_digit" do
     test "with whitespace" do
-      assert_raise ArgumentError, fn ->
-        gtin_check_digit(" 6291041500213 ")
-      end
-
-      assert_raise ArgumentError, fn ->
-        gtin_check_digit("\t6291041500213\t")
-      end
+      assert {:error, "Invalid Code"} == gtin_check_digit(" 6291041500213 ")
+      assert {:error, "Invalid Code"} == gtin_check_digit("\t6291041500213\t")
     end
 
     test "with non-numeric characters" do
-      assert_raise ArgumentError, fn ->
-        gtin_check_digit("629104150021a")
-      end
-
-      assert_raise ArgumentError, fn ->
-        gtin_check_digit("629104150021!")
-      end
+      assert {:error, "Invalid Code"} == gtin_check_digit("629104150021a")
+      assert {:error, "Invalid Code"} == gtin_check_digit("629104150021!")
     end
 
     test "with empty string" do
@@ -491,15 +481,11 @@ defmodule ExGtin.ValidationTest do
     end
 
     test "with negative numbers" do
-      assert_raise ArgumentError, fn ->
-        gtin_check_digit("-6291041500213")
-      end
+      assert {:error, "Invalid Code"} == gtin_check_digit("-6291041500213")
     end
 
     test "with decimal numbers" do
-      assert_raise ArgumentError, fn ->
-        gtin_check_digit("629104150021.3")
-      end
+      assert {:error, "Invalid Code"} == gtin_check_digit("629104150021.3")
     end
   end
 
