@@ -28,6 +28,8 @@ A [GTIN](https://www.gtin.info/) (Global Trade Item Number) & UPC (Universal Pri
   parenthesized `(01)...` form and the raw FNC1 scanner form)
 - Recognize and decode variable-measure restricted-circulation numbers (RCNs)
   against an explicit region/retailer scheme
+- Correct nearly-valid codes (trim whitespace, restore dropped leading zeros)
+  via `ExGtin.fix/1` and `ExGtin.fix/2`
 
 Features to Come:
 
@@ -109,6 +111,55 @@ iex> ExGtin.gs1_prefix_country("6291041500214")
 iex> ExGtin.normalize("6291041500213")
 {:ok, "16291041500210"}
 ```
+
+- Correct nearly-valid GTIN codes
+
+`ExGtin.fix/1` repairs the two information-preserving ways GTIN data commonly
+gets damaged: surrounding whitespace, and leading zeros dropped when a code is
+stored as an integer. It trims, left zero-pads to the target GTIN length, and
+re-validates the check digit. It never invents a significant digit and never
+alters the check digit, so a success is a genuinely valid code.
+
+```elixir
+# Restore a leading zero dropped by integer storage (11 digits -> GTIN-12)
+iex> ExGtin.fix("87248795257")
+{:ok, "087248795257"}
+
+# Strip stray whitespace
+iex> ExGtin.fix(" 6291041500213\n")
+{:ok, "6291041500213"}
+```
+
+`fix/1` infers the smallest supported GTIN length (8, 12, 13, 14) the digits fit
+into; pass an explicit length (an integer or a `:gtinN` atom) with `fix/2`:
+
+```elixir
+iex> ExGtin.fix("495205944325", 13)
+{:ok, "0495205944325"}
+
+iex> ExGtin.fix("495205944325", :gtin13)
+{:ok, "0495205944325"}
+```
+
+Anything beyond a safe repair is reported as a structured error atom so callers
+can branch on the cause:
+
+```elixir
+# Right length and all digits, but the check digit does not match
+iex> ExGtin.fix("123456789013")
+{:error, :check_digit_incorrect}
+
+# Already longer than the largest supported GTIN length
+iex> ExGtin.fix("123412341234123")
+{:error, :invalid_length}
+
+# Longer than the requested target
+iex> ExGtin.fix("0000000000000", 12)
+{:error, :too_long}
+```
+
+`ExGtin.fix!/1` and `ExGtin.fix!/2` are the raising variants, returning the
+corrected string directly or raising `ArgumentError` with the reason.
 
 - Parse GS1-128 / Application Identifier (AI) element strings
 

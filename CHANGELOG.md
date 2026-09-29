@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Best-effort GTIN correction via `ExGtin.fix/1`, `ExGtin.fix/2` and their
+  raising `fix!` counterparts (backed by the new `ExGtin.Fix` module). `fix`
+  undoes the two information-preserving mutations that damage real GTIN data —
+  dropped leading zeros (from codes stored as integers) and surrounding
+  whitespace — by trimming and left zero-padding to the target GTIN length, then
+  re-validating the check digit. `fix/1` infers the smallest supported length
+  (8, 12, 13, 14); `fix/2` takes an explicit length (`13` or `:gtin13`).
+  Failures are reported as structured atoms (`:non_numeric`, `:too_long`,
+  `:invalid_length`, `:check_digit_incorrect`) so callers can branch on the
+  cause. Inspired by the correction API of the Rust `gtin-validate` crate
+
 - `ROADMAP.md` tracking outstanding work, starting with true GS1-8
   (`960..969`) prefix semantics for GTIN-8 country lookups
 - `:mix_audit` dev/test dependency and a `mix deps.audit` step that checks

@@ -10,6 +10,7 @@ defmodule ExGtin do
   alias ExGtin.Convert.Bookland
   alias ExGtin.Convert.GTIN14
   alias ExGtin.Convert.UPC
+  alias ExGtin.Fix
   alias ExGtin.GS1.ElementString
   alias ExGtin.RCN
 
@@ -907,4 +908,85 @@ defmodule ExGtin do
       {:error, reason} -> raise ArgumentError, message: reason
     end
   end
+
+  @doc """
+  Corrects a nearly-valid GTIN, inferring the target length.
+
+  Delegates to `ExGtin.Fix.fix/1`. Trims surrounding whitespace and left-pads
+  with zeros to the smallest supported GTIN length (8, 12, 13, 14) the trimmed
+  digits fit into, then re-validates the check digit. It repairs only the
+  information-preserving damage of dropped leading zeros and stray whitespace;
+  it never alters a significant digit or the check digit.
+
+  Returns `{:ok, corrected}` or `{:error, reason}`, where `reason` is one of the
+  `t:ExGtin.Fix.reason/0` atoms (`:non_numeric`, `:too_long`, `:invalid_length`,
+  `:check_digit_incorrect`).
+
+  ## Examples
+
+      iex> ExGtin.fix("87248795257")
+      {:ok, "087248795257"}
+
+      iex> ExGtin.fix(" 6291041500213 ")
+      {:ok, "6291041500213"}
+
+      iex> ExGtin.fix("123456789013")
+      {:error, :check_digit_incorrect}
+  """
+  @doc since: "1.6.0"
+  @spec fix(String.t() | integer | list(0..9)) :: {:ok, String.t()} | {:error, Fix.reason()}
+  def fix(code), do: Fix.fix(code)
+
+  @doc """
+  Corrects a nearly-valid GTIN to a specific target length.
+
+  Delegates to `ExGtin.Fix.fix/2`. `target` is a supported length integer
+  (`8`, `12`, `13`, `14`) or its named atom (`:gtin8`, `:gtin12`, `:gtin13`,
+  `:gtin14`). Trims whitespace, left-pads with zeros to `target`, then
+  re-validates the check digit.
+
+  Returns `{:ok, corrected}` or `{:error, reason}` (see `t:ExGtin.Fix.reason/0`).
+
+  ## Examples
+
+      iex> ExGtin.fix("495205944325", 13)
+      {:ok, "0495205944325"}
+
+      iex> ExGtin.fix("0000000000000", 12)
+      {:error, :too_long}
+  """
+  @doc since: "1.6.0"
+  @spec fix(String.t() | integer | list(0..9), Fix.target()) ::
+          {:ok, String.t()} | {:error, Fix.reason()}
+  def fix(code, target), do: Fix.fix(code, target)
+
+  @doc """
+  The raising variant of `fix/1`.
+
+  Delegates to `ExGtin.Fix.fix!/1`. Returns the corrected string or raises
+  `ArgumentError` with the failure reason as its message.
+
+  ## Examples
+
+      iex> ExGtin.fix!("87248795257")
+      "087248795257"
+  """
+  @doc since: "1.6.0"
+  @spec fix!(String.t() | integer | list(0..9)) :: String.t()
+  def fix!(code), do: Fix.fix!(code)
+
+  @doc """
+  The raising variant of `fix/2`.
+
+  Delegates to `ExGtin.Fix.fix!/2`. Returns the corrected string or raises
+  `ArgumentError` with the failure reason as its message.
+
+  ## Examples
+
+      iex> ExGtin.fix!("495205944325", 13)
+      "0495205944325"
+  """
+  @doc since: "1.6.0"
+  @spec fix!(String.t() | integer | list(0..9), Fix.target()) :: String.t()
+  def fix!(code, target), do: Fix.fix!(code, target)
 end
