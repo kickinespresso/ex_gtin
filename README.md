@@ -317,3 +317,8 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ```shell
 mix hex.publish
 ```
+
+## Related Projects
+
+- [rust-gtin-validate](https://github.com/austinhartzheim/rust-gtin-validate/)
+- [gl_gtin (Gleam Gtin Validator)](https://github.com/kickinespresso/gl_gtin)
