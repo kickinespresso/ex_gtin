@@ -1,0 +1,37 @@
+name: Security Audit
+
+# Replaces the retired ShiftLeft "SL Scan" workflow. CodeQL does not support
+# BEAM languages (Elixir/Erlang), so the meaningful automated security check for
+# this library is a dependency-vulnerability audit via mix_audit, backed by the
+# Erlef Security Working Group advisory database. This runs on pushes, PRs, and
+# a weekly schedule so newly disclosed advisories are caught even without new
+# commits.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '25 16 * * 3'
+
+jobs:
+  deps-audit:
+    name: Dependency vulnerability audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.18"
+          otp-version: "27"
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Audit dependencies for known vulnerabilities
+        run: mix deps.audit

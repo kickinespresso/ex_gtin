@@ -22,7 +22,13 @@ defmodule ExGtin.Mixfile do
       homepage_url: "https://github.com/kickinespresso/ex_gtin",
       docs: [
         main: "ExGtin",
-        extras: ["README.md"]
+        extras: [
+          "README.md",
+          "ROADMAP.md",
+          "CHANGELOG.md",
+          "CONTRIBUTING.md",
+          "SECURITY.md"
+        ]
       ]
     ]
   end
@@ -54,6 +60,7 @@ defmodule ExGtin.Mixfile do
       {:credo, "~> 1.7.19", only: [:dev, :test]},
       {:ex_doc, "~> 0.40", only: :dev, runtime: false},
       {:excoveralls, "~> 0.18.5", only: :test},
+      {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
       {:stream_data, "~> 1.1", only: [:dev, :test]}
     ]
   end
@@ -74,7 +81,8 @@ defmodule ExGtin.Mixfile do
         "test",
         "credo --strict",
         "coveralls",
-        "format --check-formatted"
+        "format --check-formatted",
+        "deps.audit"
       ]
     ]
   end

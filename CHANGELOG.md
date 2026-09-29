@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - `ROADMAP.md` tracking outstanding work, starting with true GS1-8
   (`960..969`) prefix semantics for GTIN-8 country lookups
+- `:mix_audit` dev/test dependency and a `mix deps.audit` step that checks
+  dependencies against the Erlef security advisory database. It is wired into
+  the `pull_request_checkout.task` alias and CI
+- CI now enforces the documented quality gates on every matrix leg
+  (`mix format --check-formatted`, `mix credo --strict`, `mix deps.audit`) and
+  runs tests under coverage (`mix coveralls`), instead of only compiling and
+  running `mix test`
+- HexDocs now publishes `ROADMAP.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, and
+  `SECURITY.md` as documentation extras alongside the README
 
 ### Deprecated
 
@@ -34,6 +43,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `CONTRIBUTING.md`: removed container/Docker-template boilerplate from the pull
   request steps and replaced the inlined full Code of Conduct with a link to
   `CODE_OF_CONDUCT.md` to avoid the two copies drifting apart
+
+### Removed
+
+- Retired the `SL Scan` (ShiftLeft) GitHub Actions workflow, which pinned
+  abandoned/unmaintained actions (`ShiftLeftSecurity/scan-action@master`,
+  `actions/checkout@v1`, `github/codeql-action/upload-sarif@v1`). Replaced it
+  with a `security-audit.yml` workflow that runs `mix deps.audit` on pushes,
+  pull requests, and a weekly schedule (CodeQL does not support BEAM languages,
+  so dependency auditing is the meaningful automated security check here)
+- Pruned 12 stale, unused entries from `mix.lock` (`certifi`, `earmark`,
+  `exjsx`, `hackney`, `idna`, `jsx`, `metrics`, `mimerl`, `parse_trans`,
+  `poison`, `ssl_verify_fun`, `unicode_util_compat`) left over from a removed
+  HTTP/JSON dependency; `mix deps.unlock --check-unused` is now clean
 - README: the "Lookup GS1 Prefix" example now uses the public
   `ExGtin.gs1_prefix_country/1` instead of `ExGtin.Validation.find_gs1_prefix_country/1`,
   and the feature list now documents the already-shipped SSCC and GSIN
