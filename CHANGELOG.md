@@ -28,6 +28,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+- `SECURITY.md`: refreshed the supported-versions table to the current `1.5.x`
+  line (previously listed `1.0.2`/`0.4.x`/`0.3.x`) and switched vulnerability
+  reporting to private email disclosure instead of opening a public issue
+- `CONTRIBUTING.md`: removed container/Docker-template boilerplate from the pull
+  request steps and replaced the inlined full Code of Conduct with a link to
+  `CODE_OF_CONDUCT.md` to avoid the two copies drifting apart
 - README: the "Lookup GS1 Prefix" example now uses the public
   `ExGtin.gs1_prefix_country/1` instead of `ExGtin.Validation.find_gs1_prefix_country/1`,
   and the feature list now documents the already-shipped SSCC and GSIN
