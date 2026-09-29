@@ -2,12 +2,11 @@ defmodule ExGtin.GS1.AITableTest do
   @moduledoc """
   Tests for the GS1 Application Identifier dictionary (`ExGtin.GS1.AITable`).
 
-  Covers Requirement 1: the AI dictionary is maintained as static data mapping
-  each supported AI code to its name, kind, and data format (1.1); the initial
-  AI set — 01, 10, 11, 13, 15, 17, 21, and the 3xx weight AIs — is present
-  (1.2); fixed-length AIs record their exact data length via `{:fixed, len}`
-  (1.3); and variable-length AIs record their maximum length via
-  `{:variable, max_len}` (1.4).
+  The AI dictionary is maintained as static data mapping each supported AI code
+  to its name, kind, and data format; the initial AI set — 01, 10, 11, 13, 15,
+  17, 21, and the 3xx weight AIs — is present; fixed-length AIs record their
+  exact data length via `{:fixed, len}`; and variable-length AIs record their
+  maximum length via `{:variable, max_len}`.
   """
   use ExUnit.Case
 
@@ -39,8 +38,7 @@ defmodule ExGtin.GS1.AITableTest do
 
   @decimal_indicators 0..5
 
-  describe "AI dictionary is maintained as static data (1.1)" do
-    # **Validates: Requirements 1.1**
+  describe "AI dictionary is maintained as static data" do
     test "ai_table/0 returns a map of AI code to {name, kind, format}" do
       table = AITable.ai_table()
 
@@ -62,8 +60,7 @@ defmodule ExGtin.GS1.AITableTest do
     end
   end
 
-  describe "the initial base AI set is present with expected kind and length (1.2, 1.3, 1.4)" do
-    # **Validates: Requirements 1.2, 1.3, 1.4**
+  describe "the initial base AI set is present with expected kind and length" do
     for {code, expected} <- @base_ais do
       test "AI #{code} is present with the expected entry" do
         assert {:ok, unquote(Macro.escape(expected))} = AITable.lookup(unquote(code))
@@ -71,8 +68,7 @@ defmodule ExGtin.GS1.AITableTest do
     end
   end
 
-  describe "fixed-length AIs record their exact data length (1.3)" do
-    # **Validates: Requirements 1.3**
+  describe "fixed-length AIs record their exact data length" do
     test "AI 01 (GTIN) is fixed at 14" do
       assert {:ok, {_, {:fixed, 14}, _}} = AITable.lookup("01")
     end
@@ -84,8 +80,7 @@ defmodule ExGtin.GS1.AITableTest do
     end
   end
 
-  describe "variable-length AIs record their maximum length (1.4)" do
-    # **Validates: Requirements 1.4**
+  describe "variable-length AIs record their maximum length" do
     test "AI 10 (Batch/Lot) and AI 21 (Serial) are variable up to 20" do
       for code <- ["10", "21"] do
         assert {:ok, {_, {:variable, 20}, :alphanumeric}} = AITable.lookup(code)
@@ -93,8 +88,7 @@ defmodule ExGtin.GS1.AITableTest do
     end
   end
 
-  describe "the 3xx weight AIs are present with expected kind and length (1.2, 1.3)" do
-    # **Validates: Requirements 1.2, 1.3**
+  describe "the 3xx weight AIs are present with expected kind and length" do
     for {prefix, name} <- @weight_families do
       for d <- @decimal_indicators do
         code = "#{prefix}#{d}"
@@ -118,8 +112,7 @@ defmodule ExGtin.GS1.AITableTest do
     end
   end
 
-  describe "the full initial AI set count (1.2)" do
-    # **Validates: Requirements 1.2**
+  describe "the full initial AI set count" do
     test "the table holds the 7 base AIs plus 30 weight AIs (37 total)" do
       table = AITable.ai_table()
       assert map_size(table) == map_size(@base_ais) + 5 * Enum.count(@decimal_indicators)
@@ -127,8 +120,7 @@ defmodule ExGtin.GS1.AITableTest do
     end
   end
 
-  describe "unknown AIs are not present (1.1)" do
-    # **Validates: Requirements 1.1**
+  describe "unknown AIs are not present" do
     test "lookup/1 returns :error for an unsupported AI code" do
       assert AITable.lookup("99") == :error
     end

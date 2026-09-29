@@ -2,25 +2,23 @@ defmodule ExGtin.KeysTest do
   @moduledoc """
   Tests for SSCC (Serial Shipping Container Code) and GSIN (Global Shipment
   Identification Number) validation and generation (`ExGtin.Keys`) and their
-  public wiring on `ExGtin` (F5, F6).
+  public wiring on `ExGtin`.
 
-  Covers Requirement 6 (SSCC): an 18-digit SSCC with a valid mod-10 check digit
-  yields `{:ok, "SSCC"}` (F5.1); an 18-digit value with a wrong check digit
-  yields `{:error, "Invalid Code"}` (F5.2); a 17-digit body generates a complete
-  SSCC with the check digit appended (F5.3); any wrong-length input returns an
-  `{:error, _}` tuple (F5.4); an SSCC is never classified as a GTIN-14 and a
-  GTIN-14 is never classified as an SSCC, because key detection is explicit
-  (F5.5); and the round-trip `validate_sscc(generate_sscc(body)) == {:ok, "SSCC"}`
-  holds (F5.6).
+  SSCC: an 18-digit SSCC with a valid mod-10 check digit yields
+  `{:ok, "SSCC"}`; an 18-digit value with a wrong check digit yields
+  `{:error, "Invalid Code"}`; a 17-digit body generates a complete SSCC with the
+  check digit appended; any wrong-length input returns an `{:error, _}` tuple; an
+  SSCC is never classified as a GTIN-14 and a GTIN-14 is never classified as an
+  SSCC, because key detection is explicit; and the round-trip
+  `validate_sscc(generate_sscc(body)) == {:ok, "SSCC"}` holds.
 
-  Covers Requirement 7 (GSIN): a 17-digit GSIN with a valid mod-10 check digit
-  yields `{:ok, "GSIN"}` (F6.1); a 16-digit body generates a complete GSIN with
-  the check digit appended (F6.2); any wrong-length input returns an
-  `{:error, _}` tuple (F6.3); a GSIN is never classified as another key of a
-  nearby length — a 17-digit GSIN is rejected by the 18-digit `validate_sscc`
-  and is not read as a GTIN, and an 18-digit SSCC is rejected by `validate_gsin`
-  (F6.4); and the round-trip `validate_gsin(generate_gsin(body)) == {:ok, "GSIN"}`
-  holds (F6.5).
+  GSIN: a 17-digit GSIN with a valid mod-10 check digit yields
+  `{:ok, "GSIN"}`; a 16-digit body generates a complete GSIN with the check
+  digit appended; any wrong-length input returns an `{:error, _}` tuple; a GSIN
+  is never classified as another key of a nearby length — a 17-digit GSIN is
+  rejected by the 18-digit `validate_sscc` and is not read as a GTIN, and an
+  18-digit SSCC is rejected by `validate_gsin`; and the round-trip
+  `validate_gsin(generate_gsin(body)) == {:ok, "GSIN"}` holds.
 
   SSCC and GSIN check digits are computed against the real `ExGtin.CheckDigit`
   engine (via generation) rather than hand-invented, so the assertions pin
@@ -42,8 +40,7 @@ defmodule ExGtin.KeysTest do
   @gsin_body "1061414123456789"
   @gsin "10614141234567894"
 
-  describe "valid SSCC checksum yields {:ok, \"SSCC\"} (F5.1)" do
-    # **Validates: Requirements 6.1**
+  describe "valid SSCC checksum yields {:ok, \"SSCC\"}" do
     test "an 18-digit SSCC with a correct check digit validates" do
       assert Keys.validate_sscc(@sscc) == {:ok, "SSCC"}
     end
@@ -65,8 +62,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "invalid checksum yields an error (F5.2)" do
-    # **Validates: Requirements 6.2**
+  describe "invalid checksum yields an error" do
     test "an 18-digit value with a wrong check digit is rejected" do
       # @sscc ends in 8; 9 is the wrong check digit for the same body.
       assert Keys.validate_sscc("106141412345678909") == {:error, "Invalid Code"}
@@ -84,8 +80,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "wrong length yields an error (F5.4)" do
-    # **Validates: Requirements 6.4**
+  describe "wrong length yields an error" do
     test "shorter-than-18 input is rejected" do
       assert {:error, _} = Keys.validate_sscc("12345")
       assert {:error, _} = Keys.validate_sscc(@sscc_body)
@@ -100,8 +95,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "generation appends the check digit (F5.3)" do
-    # **Validates: Requirements 6.3**
+  describe "generation appends the check digit" do
     test "a 17-digit body yields an 18-digit SSCC" do
       assert {:ok, sscc} = Keys.generate_sscc(@sscc_body)
       assert String.length(sscc) == 18
@@ -114,8 +108,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "no GTIN-14 collision; key detection is explicit (F5.5)" do
-    # **Validates: Requirements 6.5**
+  describe "no GTIN-14 collision; key detection is explicit" do
     test "an 18-digit SSCC is not misread as a GTIN by validate/1" do
       # A valid SSCC is 18 digits, which is not a GTIN length; validate/1 must
       # not classify it as any GTIN type.
@@ -131,8 +124,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "round-trip validate_sscc(generate_sscc(body)) == {:ok, \"SSCC\"} (F5.6)" do
-    # **Validates: Requirements 6.6**
+  describe "round-trip validate_sscc(generate_sscc(body)) == {:ok, \"SSCC\"}" do
     for body <- [
           "10614141234567890",
           "00000000000000000",
@@ -147,8 +139,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "valid GSIN checksum yields {:ok, \"GSIN\"} (F6.1)" do
-    # **Validates: Requirements 7.1**
+  describe "valid GSIN checksum yields {:ok, \"GSIN\"}" do
     test "a 17-digit GSIN with a correct check digit validates" do
       assert Keys.validate_gsin(@gsin) == {:ok, "GSIN"}
     end
@@ -170,8 +161,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "invalid GSIN checksum yields an error (F6.1)" do
-    # **Validates: Requirements 7.1**
+  describe "invalid GSIN checksum yields an error" do
     test "a 17-digit value with a wrong check digit is rejected" do
       # @gsin ends in 4; 5 is the wrong check digit for the same body.
       assert Keys.validate_gsin("10614141234567895") == {:error, "Invalid Code"}
@@ -189,8 +179,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "wrong GSIN length yields an error (F6.3)" do
-    # **Validates: Requirements 7.3**
+  describe "wrong GSIN length yields an error" do
     test "shorter-than-17 input is rejected" do
       assert {:error, _} = Keys.validate_gsin("12345")
       assert {:error, _} = Keys.validate_gsin(@gsin_body)
@@ -205,8 +194,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "GSIN generation appends the check digit (F6.2)" do
-    # **Validates: Requirements 7.2**
+  describe "GSIN generation appends the check digit" do
     test "a 16-digit body yields a 17-digit GSIN" do
       assert {:ok, gsin} = Keys.generate_gsin(@gsin_body)
       assert String.length(gsin) == 17
@@ -219,8 +207,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "no cross-key collision; key detection is explicit (F6.4)" do
-    # **Validates: Requirements 7.4**
+  describe "no cross-key collision; key detection is explicit" do
     test "a 17-digit GSIN is not accepted by the 18-digit validate_sscc" do
       assert {:ok, "GSIN"} = Keys.validate_gsin(@gsin)
       assert {:error, _} = Keys.validate_sscc(@gsin)
@@ -238,8 +225,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "round-trip validate_gsin(generate_gsin(body)) == {:ok, \"GSIN\"} (F6.5)" do
-    # **Validates: Requirements 7.5**
+  describe "round-trip validate_gsin(generate_gsin(body)) == {:ok, \"GSIN\"}" do
     for body <- [
           "1061414123456789",
           "0000000000000000",
@@ -255,7 +241,6 @@ defmodule ExGtin.KeysTest do
   end
 
   describe "public ExGtin wiring" do
-    # **Validates: Requirements 6.1, 6.3, 6.6, 7.1, 7.2, 7.5**
     test "ExGtin.validate_sscc/1 delegates to ExGtin.Keys.validate_sscc/1" do
       assert ExGtin.validate_sscc(@sscc) == Keys.validate_sscc(@sscc)
     end
@@ -306,7 +291,7 @@ defmodule ExGtin.KeysTest do
   end
 
   # ---------------------------------------------------------------------------
-  # Generic GS1 key path (F7): validate_key/2, generate_key/2.
+  # Generic GS1 key path: validate_key/2, generate_key/2.
   #
   # Fixed-length keys and their engine-computed valid vectors (bodies one digit
   # shorter than the key; the check digit is appended by generate_key/2, never
@@ -344,8 +329,7 @@ defmodule ExGtin.KeysTest do
   # describe block below.
   @strict_fixed_key_vectors Enum.reject(@fixed_key_vectors, fn {key, _c, _b} -> key == :gdti end)
 
-  describe "validate_key/2 fixed-length: length + checksum (F7.2, F7.3)" do
-    # **Validates: Requirements 8.2, 8.3**
+  describe "validate_key/2 fixed-length: length + checksum" do
     for {key, code, _body} <- @fixed_key_vectors do
       test "a correct-length #{key} with a valid check digit yields {:ok, #{key}}" do
         assert Keys.validate_key(unquote(code), unquote(key)) == {:ok, unquote(key)}
@@ -376,8 +360,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "generate_key/2 fixed-length: appends the check digit (F7.4)" do
-    # **Validates: Requirements 8.4**
+  describe "generate_key/2 fixed-length: appends the check digit" do
     for {key, code, body} <- @fixed_key_vectors do
       test "a correct-length #{key} body yields the full code with a check digit" do
         assert {:ok, generated} = Keys.generate_key(unquote(body), unquote(key))
@@ -393,8 +376,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "generate_key/2 then validate_key/2 round-trips (F7.2, F7.4)" do
-    # **Validates: Requirements 8.2, 8.4**
+  describe "generate_key/2 then validate_key/2 round-trips" do
     for {key, _code, body} <- @fixed_key_vectors do
       test "#{key} body round-trips through generate then validate" do
         assert {:ok, code} = Keys.generate_key(unquote(body), unquote(key))
@@ -403,8 +385,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "explicit key type prevents same-length collisions (F7.6)" do
-    # **Validates: Requirements 8.6**
+  describe "explicit key type prevents same-length collisions" do
     test "the same valid 18-digit code validates as :sscc or :gsrn per the caller" do
       # Both keys are length 18; the caller's explicit key names the label.
       code = "401234500000000012"
@@ -428,7 +409,6 @@ defmodule ExGtin.KeysTest do
   end
 
   describe "unknown key yields Unsupported key" do
-    # **Validates: Requirements 8.1**
     test "an unrecognized key atom is rejected on validate" do
       assert Keys.validate_key("4012345000009", :bogus) == {:error, "Unsupported key"}
     end
@@ -438,8 +418,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "variable-component key GRAI: format validation (F7.5)" do
-    # **Validates: Requirements 8.5**
+  describe "variable-component key GRAI: format validation" do
     test "a valid 14-digit numeric core (no serial) validates" do
       assert Keys.validate_key("00614141543212", :grai) == {:ok, :grai}
     end
@@ -471,8 +450,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "variable-component key GIAI: format validation (F7.5)" do
-    # **Validates: Requirements 8.5**
+  describe "variable-component key GIAI: format validation" do
     test "a numeric-prefixed value validates" do
       assert Keys.validate_key("4000001111", :giai) == {:ok, :giai}
     end
@@ -503,8 +481,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "variable-component key GDTI: format validation (F7.5)" do
-    # **Validates: Requirements 8.5**
+  describe "variable-component key GDTI: format validation" do
     test "a valid 13-digit core (no serial) validates" do
       assert Keys.validate_key("4012345000009", :gdti) == {:ok, :gdti}
     end
@@ -535,8 +512,7 @@ defmodule ExGtin.KeysTest do
     end
   end
 
-  describe "public ExGtin.validate_key/2 and generate_key/2 wiring (F7)" do
-    # **Validates: Requirements 8.2, 8.4, 8.5, 8.6**
+  describe "public ExGtin.validate_key/2 and generate_key/2 wiring" do
     test "ExGtin.validate_key/2 delegates to ExGtin.Keys.validate_key/2" do
       for {key, code, _body} <- @fixed_key_vectors do
         assert ExGtin.validate_key(code, key) == Keys.validate_key(code, key)

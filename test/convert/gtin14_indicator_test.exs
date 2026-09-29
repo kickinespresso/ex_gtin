@@ -1,8 +1,8 @@
 defmodule ExGtin.Convert.GTIN14IndicatorTest do
   @moduledoc """
-  Tests for the configurable GTIN-14 indicator digit (F2) on `ExGtin.normalize/2`.
+  Tests for the configurable GTIN-14 indicator digit on `ExGtin.normalize/2`.
 
-  Covers Requirement 3: `normalize/2` accepts an indicator in `0..9` that
+  `normalize/2` accepts an indicator in `0..9` that
   becomes the leading digit of the emitted GTIN-14 (with a recomputed check
   digit); `normalize/1` behaves exactly as before (indicator `1`); an
   out-of-range indicator returns `{:error, _}`; and the output validates as a
@@ -19,7 +19,6 @@ defmodule ExGtin.Convert.GTIN14IndicatorTest do
   @base "6291041500213"
 
   describe "each indicator 0..9 yields a valid GTIN-14 with matching first digit" do
-    # **Validates: Requirements 3.1, 3.3, 3.5**
     for indicator <- 0..9 do
       test "indicator #{indicator} produces a valid 14-digit GTIN-14" do
         assert {:ok, code} = normalize(@base, unquote(indicator))
@@ -38,7 +37,6 @@ defmodule ExGtin.Convert.GTIN14IndicatorTest do
   end
 
   describe "normalize/1 default is unchanged (regression)" do
-    # **Validates: Requirements 3.2**
     test "GTIN-13 default matches the pre-feature output" do
       assert normalize(@base) == {:ok, "16291041500210"}
     end
@@ -61,7 +59,6 @@ defmodule ExGtin.Convert.GTIN14IndicatorTest do
   end
 
   describe "out-of-range indicator returns an error" do
-    # **Validates: Requirements 3.4**
     test "indicator above the range is rejected" do
       assert {:error, _} = normalize(@base, 10)
     end

@@ -2,7 +2,7 @@ defmodule ExGtin.CheckDigitTest do
   @moduledoc """
   Tests for the shared mod-10 check-digit engine (`ExGtin.CheckDigit`).
 
-  These guard the F0 refactor: a property test that `valid?(append(body))` is
+  These guard the shared check-digit refactor: a property test that `valid?(append(body))` is
   always true, and an equivalence test that the shared engine produces results
   identical to the pre-refactor GTIN implementation
   (`ExGtin.Validation.generate_check_digit/1`) across the existing GTIN test
@@ -43,7 +43,6 @@ defmodule ExGtin.CheckDigitTest do
   end
 
   describe "property: append then validate" do
-    # **Validates: Requirements 1.2, 1.3**
     property "valid?(append(body)) is always true for random digit-list bodies" do
       check all(body <- list_of(integer(0..9), min_length: 1, max_length: 20)) do
         assert CheckDigit.valid?(CheckDigit.append(body))
@@ -52,7 +51,6 @@ defmodule ExGtin.CheckDigitTest do
   end
 
   describe "equivalence with pre-refactor GTIN implementation" do
-    # **Validates: Requirements 1.5**
     test "mod10/append match Validation.generate_check_digit/1 on GTIN vectors" do
       Enum.each(@gtin_bodies, fn body ->
         expected = Validation.generate_check_digit(body)

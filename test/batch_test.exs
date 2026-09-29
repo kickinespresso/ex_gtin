@@ -1,14 +1,14 @@
 defmodule ExGtin.BatchTest do
   @moduledoc """
   Tests for batch validation helpers (`ExGtin.Batch`) and their public wiring on
-  `ExGtin.validate_all/1` and `ExGtin.partition/1` (F9).
+  `ExGtin.validate_all/1` and `ExGtin.partition/1`.
 
-  Covers Requirement 10: `validate_all/1` returns a list of
-  `{code, {:ok, type} | {:error, reason}}` tuples preserving input order
-  (F9.1); `partition/1` splits inputs into `%{valid: [...], invalid: [...]}`
-  (F9.2); an empty list yields an empty result without raising (F9.3); and an
-  invalid item is captured as an error rather than raising, across a variety of
-  bad inputs — wrong length, non-digit, and a tampered check digit (F9.4).
+  `validate_all/1` returns a list of
+  `{code, {:ok, type} | {:error, reason}}` tuples preserving input order;
+  `partition/1` splits inputs into `%{valid: [...], invalid: [...]}`; an empty
+  list yields an empty result without raising; and an invalid item is captured
+  as an error rather than raising, across a variety of bad inputs — wrong
+  length, non-digit, and a tampered check digit.
 
   Known fixtures: "6291041500213" -> {:ok, "GTIN-13"} and "6291041500214"
   (tampered check digit) -> {:error, "Invalid Code"}, confirmed against
@@ -24,8 +24,7 @@ defmodule ExGtin.BatchTest do
   # wrong length, non-digit characters, and a tampered check digit.
   @bad_inputs ["12345", "629104150021a", "6291041500214"]
 
-  describe "validate_all/1 pairs each input with its result (F9.1)" do
-    # **Validates: Requirements 10.1**
+  describe "validate_all/1 pairs each input with its result" do
     test "a mixed list pairs each code with its validate/1 result" do
       assert Batch.validate_all(["6291041500213", "6291041500214"]) == [
                {"6291041500213", {:ok, "GTIN-13"}},
@@ -49,8 +48,7 @@ defmodule ExGtin.BatchTest do
     end
   end
 
-  describe "partition/1 splits into valid and invalid buckets (F9.2)" do
-    # **Validates: Requirements 10.2**
+  describe "partition/1 splits into valid and invalid buckets" do
     test "a mixed list is split into valid and invalid" do
       assert Batch.partition(["6291041500213", "6291041500214"]) ==
                %{valid: ["6291041500213"], invalid: ["6291041500214"]}
@@ -72,8 +70,7 @@ defmodule ExGtin.BatchTest do
     end
   end
 
-  describe "empty list yields an empty result without raising (F9.3)" do
-    # **Validates: Requirements 10.3**
+  describe "empty list yields an empty result without raising" do
     test "validate_all/1 returns []" do
       assert Batch.validate_all([]) == []
     end
@@ -83,8 +80,7 @@ defmodule ExGtin.BatchTest do
     end
   end
 
-  describe "invalid items are captured as errors, not raised (F9.4)" do
-    # **Validates: Requirements 10.4**
+  describe "invalid items are captured as errors, not raised" do
     test "validate_all/1 pairs each bad input with an {:error, _} tuple" do
       for {code, result} <- Batch.validate_all(@bad_inputs) do
         assert {:error, _} = result
@@ -108,7 +104,6 @@ defmodule ExGtin.BatchTest do
   end
 
   describe "public ExGtin.validate_all/1 wiring" do
-    # **Validates: Requirements 10.1**
     test "delegates to ExGtin.Batch.validate_all/1" do
       codes = ["6291041500213", "6291041500214", "12345"]
       assert ExGtin.validate_all(codes) == Batch.validate_all(codes)
@@ -120,7 +115,6 @@ defmodule ExGtin.BatchTest do
   end
 
   describe "public ExGtin.partition/1 wiring" do
-    # **Validates: Requirements 10.2**
     test "delegates to ExGtin.Batch.partition/1" do
       codes = ["6291041500213", "6291041500214", "12345"]
       assert ExGtin.partition(codes) == Batch.partition(codes)

@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   `master`
 - Bumped `.tool-versions` to `elixir 1.20.4` / `erlang 29.0` for local dev
   parity with the newest CI leg
+- Documentation cleanup: removed internal spec-tracking identifiers (feature IDs
+  and requirement numbers) from source docstrings, code comments, and test
+  descriptions so the documentation reads on its own. No API, behavior, or test
+  coverage change
 
 ### Fixed
 

@@ -2,7 +2,7 @@ defmodule ExGtin.Convert.UPCTest do
   @moduledoc """
   Tests for UPC-E ⇄ UPC-A conversion (`ExGtin.Convert.UPC`).
 
-  Covers the F1 acceptance criteria: round-trip across all four 6th-digit
+  Covers: round-trip across all four 6th-digit
   expansion branches for both number systems; rejection of ineligible number
   systems, wrong length, and non-numeric input; the non-compressible UPC-A
   error; the GTIN-12 validity of expanded output; and the raising `!` variants.
@@ -34,7 +34,6 @@ defmodule ExGtin.Convert.UPCTest do
   ]
 
   describe "round-trip across all four 6th-digit branches" do
-    # **Validates: Requirements 2.1, 2.2, 2.8**
     for {label, upce, upca} <- @roundtrip_vectors do
       test "expands and compresses #{label} exactly" do
         assert UPC.upce_to_upca(unquote(upce)) == {:ok, unquote(upca)}
@@ -49,7 +48,6 @@ defmodule ExGtin.Convert.UPCTest do
   end
 
   describe "expanded UPC-A validates as GTIN-12" do
-    # **Validates: Requirements 2.9**
     for {label, upce, upca} <- @roundtrip_vectors do
       test "#{label} expands to a valid GTIN-12" do
         assert {:ok, expanded} = UPC.upce_to_upca(unquote(upce))
@@ -60,7 +58,6 @@ defmodule ExGtin.Convert.UPCTest do
   end
 
   describe "reject ineligible number system (2–9)" do
-    # **Validates: Requirements 2.3**
     for ns <- 2..9 do
       test "number system #{ns} is rejected" do
         upce = "#{unquote(ns)}1234560"
@@ -70,7 +67,6 @@ defmodule ExGtin.Convert.UPCTest do
   end
 
   describe "reject wrong length / non-numeric input" do
-    # **Validates: Requirements 2.4**
     test "too short is rejected" do
       assert UPC.upce_to_upca("1234567") == {:error, "Invalid UPC-E length"}
     end
@@ -93,7 +89,6 @@ defmodule ExGtin.Convert.UPCTest do
   end
 
   describe "reject non-compressible UPC-A" do
-    # **Validates: Requirements 2.6**
     test "a UPC-A with no zero-run pattern is not compressible" do
       assert UPC.upca_to_upce("012345678905") ==
                {:error, "UPC-A is not compressible to UPC-E"}
@@ -101,7 +96,6 @@ defmodule ExGtin.Convert.UPCTest do
   end
 
   describe "String, integer, and digit-list inputs" do
-    # **Validates: Requirements 2.1, 2.5**
     test "digit-list UPC-E expands like the string form" do
       assert UPC.upce_to_upca([0, 1, 2, 3, 4, 5, 0, 5]) == {:ok, "012000003455"}
     end
@@ -116,7 +110,6 @@ defmodule ExGtin.Convert.UPCTest do
   end
 
   describe "raising ! variants" do
-    # **Validates: Requirements 2.7**
     test "upce_to_upca!/1 returns the string on success" do
       assert ExGtin.upce_to_upca!("01234505") == "012000003455"
     end

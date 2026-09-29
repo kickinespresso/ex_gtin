@@ -2,25 +2,24 @@ defmodule ExGtin.GS1.ElementStringTest do
   @moduledoc """
   Tests for the GS1 element-string parser (`ExGtin.GS1.ElementString`).
 
-  Covers Requirement 2 (parenthesized form): a parenthesized element string of
-  supported AIs parses to `{:ok, map}` mapping each AI code to its value (2.1); a
-  fixed-length AI value with the wrong length errors identifying the AI (2.2); an
-  AI code not in the dictionary errors identifying the unknown AI (2.3); and a
-  malformed payload (unbalanced parentheses) errors with position information
-  (2.4).
+  Parenthesized form: a parenthesized element string of supported AIs parses to
+  `{:ok, map}` mapping each AI code to its value; a fixed-length AI value with
+  the wrong length errors identifying the AI; an AI code not in the dictionary
+  errors identifying the unknown AI; and a malformed payload (unbalanced
+  parentheses) errors with position information.
 
-  Covers Requirement 3 (raw FNC1 form): fixed-length AIs concatenated without a
-  separator are segmented by dictionary length (3.1); a variable-length AI
-  followed by more data terminates at the FNC1/GS separator (3.2); the raw and
-  parenthesized forms of the same logical payload produce equal maps (3.3); and a
-  trailing variable-length AI with no separator consumes the remainder (3.4).
+  Raw FNC1 form: fixed-length AIs concatenated without a separator are segmented
+  by dictionary length; a variable-length AI followed by more data terminates at
+  the FNC1/GS separator; the raw and parenthesized forms of the same logical
+  payload produce equal maps; and a trailing variable-length AI with no
+  separator consumes the remainder.
 
-  Covers Requirement 4 (embedded identifiers and dates): a valid embedded GTIN
-  (AI 01) parses successfully and an embedded GTIN whose check digit fails — or
-  that is non-numeric — errors identifying the invalid GTIN (4.1, 4.2); date AIs
-  (11/13/15/17) surface as their raw `YYMMDD` string by default (4.3); and date
-  interpretation is opt-in via `dates: :parsed`, mapping the value into an
-  Elixir `Date` while leaving the raw string as the default (4.4).
+  Embedded identifiers and dates: a valid embedded GTIN (AI 01) parses
+  successfully and an embedded GTIN whose check digit fails — or that is
+  non-numeric — errors identifying the invalid GTIN; date AIs (11/13/15/17)
+  surface as their raw `YYMMDD` string by default; and date interpretation is
+  opt-in via `dates: :parsed`, mapping the value into an Elixir `Date` while
+  leaving the raw string as the default.
 
   The module doctests (on `parse_parenthesized/1` and `parse_raw/1`) are included
   via `doctest`.
@@ -31,8 +30,7 @@ defmodule ExGtin.GS1.ElementStringTest do
 
   alias ExGtin.GS1.ElementString
 
-  describe "multi-AI parenthesized payloads parse correctly (2.1)" do
-    # **Validates: Requirements 2.1**
+  describe "multi-AI parenthesized payloads parse correctly" do
     test "a GTIN + expiration date + batch payload parses to the expected map" do
       assert {:ok, %{"01" => "06291041500213", "17" => "261231", "10" => "ABC123"}} =
                ElementString.parse_parenthesized("(01)06291041500213(17)261231(10)ABC123")
@@ -58,8 +56,7 @@ defmodule ExGtin.GS1.ElementStringTest do
     end
   end
 
-  describe "unknown AI errors with code + position (2.3)" do
-    # **Validates: Requirements 2.3**
+  describe "unknown AI errors with code + position" do
     test "an unsupported leading AI reports the code and position 0" do
       assert {:error, {:unknown_ai, "99", 0}} =
                ElementString.parse_parenthesized("(99)000000")
@@ -68,14 +65,13 @@ defmodule ExGtin.GS1.ElementStringTest do
     test "an unknown AI after a valid segment surfaces the unparsed remainder" do
       # Once a leading segment has parsed, an unknown trailing AI is not a hard
       # error: the interpreted prefix is returned and the uninterpretable tail is
-      # reported as the unparsed remainder rather than dropped (Requirement 5.3).
+      # reported as the unparsed remainder rather than dropped.
       assert {:ok, %{"01" => "06291041500213"}, "(99)000000"} =
                ElementString.parse_parenthesized("(01)06291041500213(99)000000")
     end
   end
 
-  describe "wrong fixed-length value errors identifying the AI + position (2.2)" do
-    # **Validates: Requirements 2.2**
+  describe "wrong fixed-length value errors identifying the AI + position" do
     test "a too-short GTIN value reports the AI, expected/actual lengths, position" do
       assert {:error, {:invalid_length, "01", 14, 3, 0}} =
                ElementString.parse_parenthesized("(01)123")
@@ -93,8 +89,7 @@ defmodule ExGtin.GS1.ElementStringTest do
     end
   end
 
-  describe "unbalanced parentheses errors with position (2.4)" do
-    # **Validates: Requirements 2.4**
+  describe "unbalanced parentheses errors with position" do
     test "a leading segment missing its closing paren reports position 0" do
       assert {:error, {:unbalanced_parentheses, 0}} =
                ElementString.parse_parenthesized("(01")
@@ -116,8 +111,7 @@ defmodule ExGtin.GS1.ElementStringTest do
   # The FNC1/GS separator that terminates a variable-length AI in the raw form.
   @gs <<29>>
 
-  describe "fixed-length AIs segmented without a separator (3.1)" do
-    # **Validates: Requirements 3.1**
+  describe "fixed-length AIs segmented without a separator" do
     test "a single fixed-length AI is segmented by its dictionary length" do
       assert {:ok, %{"01" => "06291041500213"}} =
                ElementString.parse_raw("0106291041500213")
@@ -135,8 +129,7 @@ defmodule ExGtin.GS1.ElementStringTest do
     end
   end
 
-  describe "variable-length AIs terminated by FNC1/GS (3.2)" do
-    # **Validates: Requirements 3.2**
+  describe "variable-length AIs terminated by FNC1/GS" do
     test "a variable AI followed by more data terminates at the separator" do
       assert {:ok, %{"10" => "ABC123", "17" => "261231"}} =
                ElementString.parse_raw("10ABC123" <> @gs <> "17261231")
@@ -153,8 +146,7 @@ defmodule ExGtin.GS1.ElementStringTest do
     end
   end
 
-  describe "trailing variable AI consumes the remainder (3.4)" do
-    # **Validates: Requirements 3.4**
+  describe "trailing variable AI consumes the remainder" do
     test "a trailing variable AI with no separator consumes the rest of the payload" do
       assert {:ok, %{"01" => "06291041500213", "10" => "ABC123"}} =
                ElementString.parse_raw("010629104150021310ABC123")
@@ -166,8 +158,7 @@ defmodule ExGtin.GS1.ElementStringTest do
     end
   end
 
-  describe "raw and parenthesized forms of the same payload produce equal maps (3.3)" do
-    # **Validates: Requirements 3.3**
+  describe "raw and parenthesized forms of the same payload produce equal maps" do
     test "a fixed-only payload parses equally in both forms" do
       # No variable AIs, so the raw form needs no separator at all.
       raw = "010629104150021317261231"
@@ -202,8 +193,7 @@ defmodule ExGtin.GS1.ElementStringTest do
     end
   end
 
-  describe "embedded GTIN (AI 01) is validated via the check-digit engine (4.1)" do
-    # **Validates: Requirements 4.1**
+  describe "embedded GTIN (AI 01) is validated via the check-digit engine" do
     test "a valid embedded GTIN parses successfully in the parenthesized form" do
       assert {:ok, %{"01" => "06291041500213"}} =
                ElementString.parse_parenthesized("(01)06291041500213")
@@ -220,8 +210,7 @@ defmodule ExGtin.GS1.ElementStringTest do
     end
   end
 
-  describe "an invalid embedded GTIN errors identifying the GTIN (4.2)" do
-    # **Validates: Requirements 4.2**
+  describe "an invalid embedded GTIN errors identifying the GTIN" do
     test "a GTIN with a bad check digit errors (parenthesized form)" do
       # "06291041500213" is valid; flipping the last digit to 4 breaks the
       # mod-10 check digit.
@@ -241,8 +230,7 @@ defmodule ExGtin.GS1.ElementStringTest do
     end
   end
 
-  describe "date AIs surface as raw YYMMDD by default (4.3)" do
-    # **Validates: Requirements 4.3**
+  describe "date AIs surface as raw YYMMDD by default" do
     test "an expiration date (AI 17) is the raw YYMMDD string, not a Date" do
       assert {:ok, %{"17" => "261231"}} = ElementString.parse_raw("17261231")
     end
@@ -260,8 +248,7 @@ defmodule ExGtin.GS1.ElementStringTest do
     end
   end
 
-  describe "opt-in date interpretation via dates: :parsed (4.4)" do
-    # **Validates: Requirements 4.4**
+  describe "opt-in date interpretation via dates: :parsed" do
     test "dates: :parsed interprets an expiration date into a Date (raw form)" do
       # Current-year context is 2026, and the GS1 year window
       # [current_year - 49, current_year + 50] maps "26" -> 2026.

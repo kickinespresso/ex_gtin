@@ -78,7 +78,7 @@ defmodule ExGtin.Batch do
   # `ExGtin.validate/1` only guards on length: a wrong-length input returns an
   # `{:error, _}` tuple, but a correct-length input with non-digit characters
   # raises `ArgumentError` from the underlying integer conversion. The batch
-  # contract (F9.4) is that no individual item ever aborts the batch, so any
+  # contract is that no individual item ever aborts the batch, so any
   # raised error is caught here and reported as `{:error, "Invalid Code"}`.
   @spec safe_validate(term()) :: ExGtin.result()
   defp safe_validate(code) do

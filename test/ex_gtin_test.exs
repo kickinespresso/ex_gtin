@@ -307,14 +307,15 @@ defmodule ExGtinTest do
     end
   end
 
-  # Requirement 5 — public element-string parsing API (F10). The parse_gs1
+  # Public element-string parsing API. The parse_gs1
   # doctests in lib/ex_gtin.ex are already exercised by the `doctest ExGtin`
-  # declaration above; these unit tests cover the behaviours that back
-  # requirements 5.1–5.4 through the public entry points.
+  # declaration above; these unit tests cover the mixed-payload, both-forms,
+  # unparsed-remainder, and unsupported-AI behaviours through the public entry
+  # points.
   @valid_embedded_gtin "06291041500213"
   @gs <<29>>
 
-  describe "parse_gs1/1 mixed payloads (5.1)" do
+  describe "parse_gs1/1 mixed payloads" do
     test "parenthesized payload with multiple AIs parses to the expected map" do
       assert {:ok, %{"01" => @valid_embedded_gtin, "17" => "261231", "10" => "ABC123"}} ==
                parse_gs1("(01)06291041500213(17)261231(10)ABC123")
@@ -333,7 +334,7 @@ defmodule ExGtinTest do
     end
   end
 
-  describe "parse_gs1/1 accepts both forms through one entry point (5.2)" do
+  describe "parse_gs1/1 accepts both forms through one entry point" do
     test "parenthesized and raw forms of the same payload produce equal maps" do
       parenthesized = parse_gs1("(01)06291041500213(10)ABC123")
       raw = parse_gs1("010629104150021310ABC123")
@@ -343,14 +344,14 @@ defmodule ExGtinTest do
     end
   end
 
-  describe "parse_gs1/1 surfaces the unparsed remainder (5.3)" do
+  describe "parse_gs1/1 surfaces the unparsed remainder" do
     test "a trailing unknown AI is reported as the unparsed remainder" do
       assert {:ok, %{"01" => @valid_embedded_gtin}, "(99)ABC"} ==
                parse_gs1("(01)06291041500213(99)ABC")
     end
   end
 
-  describe "parse_gs1/1 errors on an unsupported AI at the start (5.4)" do
+  describe "parse_gs1/1 errors on an unsupported AI at the start" do
     test "an unknown AI at position 0 errors with the code and position" do
       assert {:error, {:unknown_ai, "99", 0}} == parse_gs1("(99)ABC")
     end
@@ -384,15 +385,15 @@ defmodule ExGtinTest do
     end
   end
 
-  # Requirement 8 — public RCN parsing API (F11). The parse_rcn/2 and
+  # Public RCN parsing API. The parse_rcn/2 and
   # parse_rcn!/2 doctests in lib/ex_gtin.ex are already exercised by the
-  # `doctest ExGtin` declaration above; these unit tests cover the behaviours
-  # that back requirements 8.1–8.3 through the public entry points, including a
-  # fixture per shipped scheme.
+  # `doctest ExGtin` declaration above; these unit tests cover the
+  # scheme-map, named-scheme, and unknown-prefix/scheme behaviours through the
+  # public entry points, including a fixture per shipped scheme.
   @germany_price_fixture "2123451789012"
   @embedded_weight_fixture "2456789012349"
 
-  describe "parse_rcn/2 fixtures per shipped scheme (8.2)" do
+  describe "parse_rcn/2 fixtures per shipped scheme" do
     test ":gs1_germany_price decodes the price fixture" do
       assert {:ok, %{item: "12345", embedded: %{price: "78901"}}} ==
                parse_rcn(@germany_price_fixture, :gs1_germany_price)
@@ -404,7 +405,7 @@ defmodule ExGtinTest do
     end
   end
 
-  describe "parse_rcn/2 accepts a scheme map (8.1)" do
+  describe "parse_rcn/2 accepts a scheme map" do
     test "an explicit scheme map decodes the same as its named equivalent" do
       scheme = %{prefix: ["2"], item: 2..6, embedded: {:price, 8..12}, check: nil}
 
@@ -413,7 +414,7 @@ defmodule ExGtinTest do
     end
   end
 
-  describe "parse_rcn/2 errors on unknown prefix or scheme (8.3)" do
+  describe "parse_rcn/2 errors on unknown prefix or scheme" do
     test "a non-RCN / wrong-prefix code errors against a shipped scheme" do
       assert {:error, _reason} = parse_rcn("6291041500213", :gs1_germany_price)
     end

@@ -225,7 +225,7 @@ defmodule ExGtin.Keys do
 
   ## Variable-component keys
 
-  These are **not** validated by length alone (per Requirement F7.5):
+  These are **not** validated by length alone; each has its own format rules:
 
     * `:grai` — 14-digit numeric core (`"0"` + 13 digits, last is a mod-10 check
       over the first 13) plus an optional serial of up to 16 GS1
@@ -363,7 +363,7 @@ defmodule ExGtin.Keys do
   end
 
   # ---------------------------------------------------------------------------
-  # Variable-component key validators (F7.5)
+  # Variable-component key validators
   #
   # These keys carry a variable serial/reference component and so are validated
   # by format rules layered on top of the check-digit engine, NOT by length
