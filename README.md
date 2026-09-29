@@ -20,6 +20,10 @@ A [GTIN](https://www.gtin.info/) (Global Trade Item Number) & UPC (Universal Pri
 - Check GTIN validity
 - Lookup GS1 country prefix
 - Convert (normalize) GTIN-13 to GTIN-14
+- Validate and generate Serial Shipping Container Codes (SSCC) via
+  `ExGtin.validate_sscc/1` and `ExGtin.generate_sscc/1`
+- Validate and generate Global Shipment Identification Numbers (GSIN) via
+  `ExGtin.validate_gsin/1` and `ExGtin.generate_gsin/1`
 - Parse GS1-128 / Application Identifier (AI) element strings (both the
   parenthesized `(01)...` form and the raw FNC1 scanner form)
 - Recognize and decode variable-measure restricted-circulation numbers (RCNs)
@@ -27,8 +31,7 @@ A [GTIN](https://www.gtin.info/) (Global Trade Item Number) & UPC (Universal Pri
 
 Features to Come:
 
-- Global Shipment Identification Number (GSIN)
-- Serial Shipping Container Code (SSCC)
+- True GS1-8 (`960..969`) prefix semantics for GTIN-8 country lookups
 
 ## Installation
 
@@ -88,10 +91,17 @@ iex> ExGtin.generate!("629104150021")
 
 - Lookup GS1 Prefix
 
+Prefer the public `ExGtin.gs1_prefix_country/1` facade over reaching into the
+internal `ExGtin.Validation` module directly.
+
 ```elixir
-iex> ExGtin.Validation.find_gs1_prefix_country("53523235")
-{:ok, "GS1 Malta"}
+iex> ExGtin.gs1_prefix_country("6291041500214")
+{:ok, "GS1 Emirates"}
 ```
+
+> Note: GTIN-8 prefix lookups use GTIN-13 prefix-table semantics and can be
+> misleading; they are deprecated pending real GS1-8 support. GTIN-12/13/14
+> lookups are unaffected.
 
 - Convert GTIN-13 to GTIN 14
 

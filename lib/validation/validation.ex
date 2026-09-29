@@ -299,17 +299,24 @@ defmodule ExGtin.Validation do
   Find the GS1 prefix country for a GTIN number
 
   Performs a *prefix-table* lookup on the leading digits of the input against
-  the GTIN-13 country-prefix table. Note that for an 8-digit input this does
-  **not** implement true GS1-8 prefix semantics (the `960..969` "Global Office
-  GTIN-8" range); it simply looks the leading three digits up in the same
-  GTIN-13 table. Real GTIN-8 (GS1-8) prefix support is a future enhancement.
+  the GTIN-13 country-prefix table.
+
+  > #### GTIN-8 lookups are deprecated {: .warning}
+  >
+  > For an 8-digit (GTIN-8) input this does **not** implement true GS1-8 prefix
+  > semantics (the `960..969` "Global Office GTIN-8" range); it simply looks the
+  > leading three digits up in the same GTIN-13 table, which can return a
+  > **misleading** Member Organisation for a GTIN-8. Passing a GTIN-8 to this
+  > function is deprecated and may change (or start returning an error) in a
+  > future release once real GS1-8 prefix support lands. GTIN-12/13/14 lookups
+  > are unaffected.
+
+  Prefer the public facade `ExGtin.gs1_prefix_country/1` over calling this
+  internal `ExGtin.Validation` function directly.
 
   Returns `{atom, String.t()}`
 
   ## Examples
-
-      iex> ExGtin.Validation.find_gs1_prefix_country("53523235")
-      {:ok, "GS1 Malta"}
 
       iex> ExGtin.Validation.find_gs1_prefix_country("6291041500214")
       {:ok, "GS1 Emirates"}
@@ -318,6 +325,8 @@ defmodule ExGtin.Validation do
       {:error, "No GS1 prefix found"}
   """
   @doc since: "1.0.0"
+  @doc deprecated:
+         "Passing a GTIN-8 to find_gs1_prefix_country/1 uses GTIN-13 prefix semantics and may be misleading; prefer ExGtin.gs1_prefix_country/1 for GTIN-12/13/14."
   @spec find_gs1_prefix_country(String.t()) :: {atom, String.t()}
   def find_gs1_prefix_country(number) when is_bitstring(number) do
     case string_to_digits(number) do

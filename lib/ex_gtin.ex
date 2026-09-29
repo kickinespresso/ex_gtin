@@ -693,6 +693,11 @@ defmodule ExGtin do
   @doc """
   Find the GS1 prefix country for a GTIN number
 
+  This is the preferred public entry point for prefix lookups; it delegates to
+  `ExGtin.Validation.find_gs1_prefix_country/1`. Note that GTIN-8 inputs use
+  GTIN-13 prefix-table semantics and can be misleading (see that function's
+  deprecation note); GTIN-12/13/14 lookups are unaffected.
+
   Returns `{atom, String.t()}`
 
   ## Examples

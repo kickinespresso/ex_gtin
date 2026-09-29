@@ -7,7 +7,32 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- `ROADMAP.md` tracking outstanding work, starting with true GS1-8
+  (`960..969`) prefix semantics for GTIN-8 country lookups
+
+### Deprecated
+
+- Passing a **GTIN-8** to `ExGtin.Validation.find_gs1_prefix_country/1` (and
+  therefore to `ExGtin.gs1_prefix_country/1`) is deprecated. The 8-digit path
+  performs a GTIN-13 prefix-table lookup and does **not** implement true GS1-8
+  (`960..969`) prefix semantics, so it can return a misleading Member
+  Organisation. Runtime behavior is unchanged for now; the function carries a
+  `@deprecated` doc marker and a warning admonition, and the GTIN-8 result may
+  change (or become an error) in a future release once real GS1-8 support
+  lands (tracked in `ROADMAP.md`). GTIN-12/13/14 lookups are unaffected
+- Reaching into the internal `ExGtin.Validation` module for prefix lookups is
+  discouraged; prefer the public `ExGtin.gs1_prefix_country/1` facade. Docs and
+  the README now steer callers to the facade
+
 ### Changed
+
+- README: the "Lookup GS1 Prefix" example now uses the public
+  `ExGtin.gs1_prefix_country/1` instead of `ExGtin.Validation.find_gs1_prefix_country/1`,
+  and the feature list now documents the already-shipped SSCC and GSIN
+  validate/generate functions (previously mislabeled "Features to Come"). "True
+  GS1-8 prefix semantics" is now the outstanding future item
 
 - CI (`.github/workflows/elixir.yml`) now runs a version matrix instead of a
   single Elixir version: `1.15`/OTP `26` (the `~> 1.15` floor declared in
